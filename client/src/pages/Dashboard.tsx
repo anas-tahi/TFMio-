@@ -79,6 +79,22 @@ export default function Dashboard() {
           <p className="text-xs text-slate-400 mt-4">
             Estas funciones se construirán en la Fase 2 y Fase 3.
           </p>
+          {user.role === "student" && (
+            <a
+              href="/profile-setup"
+              className="inline-block mt-4 text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition"
+            >
+              Completar mi perfil →
+            </a>
+          )}
+          {user.role === "tutor" && (
+            <a
+              href="/topics/new"
+              className="inline-block mt-4 text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition"
+            >
+              Publicar un tema →
+            </a>
+          )}
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-3">

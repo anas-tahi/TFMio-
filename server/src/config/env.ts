@@ -21,6 +21,7 @@ export const env = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
 
   openaiApiKey: process.env.OPENAI_API_KEY || "",
+  openaiBaseUrl: process.env.OPENAI_BASE_URL || undefined, // set this to use Ollama instead of OpenAI
   embeddingModel: process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
   chatModel: process.env.OPENAI_CHAT_MODEL || "gpt-4o-mini",
 } as const;

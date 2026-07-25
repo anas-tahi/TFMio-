@@ -4,6 +4,8 @@ import { useAuth } from "./store/auth";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import ProfileSetup from "./pages/ProfileSetup";
+import CreateTopic from "./pages/CreateTopic";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuth((s) => s.token);
@@ -41,6 +43,22 @@ export default function App() {
             <PublicOnlyRoute>
               <Register />
             </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/profile-setup"
+          element={
+            <ProtectedRoute>
+              <ProfileSetup />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/topics/new"
+          element={
+            <ProtectedRoute>
+              <CreateTopic />
+            </ProtectedRoute>
           }
         />
         <Route

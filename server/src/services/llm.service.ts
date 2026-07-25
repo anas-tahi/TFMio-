@@ -1,23 +1,13 @@
 import OpenAI from "openai";
 import { env } from "../config/env.js";
 
-/**
- * LLM service — the AI layer of TFMio.
- *
- * This single file contains every interaction with the language model:
- *   1. embed()            → text into a vector (features #33, #34)
- *   2. cosineSimilarity() → compare two vectors (feature #35, pure math)
- *   3. generateProfileSummary() → describe a student (feature #03)
- *   4. generateMatchSummary()   → explain a student↔topic fit (feature #36)
- *   5. analyzeDocument()        → summarize an uploaded doc (feature #37)
- */
 
-const openai = new OpenAI({ apiKey: env.openaiApiKey });
+const openai = new OpenAI({
+  apiKey: env.openaiApiKey,
+  baseURL: env.openaiBaseUrl, // if set (e.g. for Ollama), requests go there instead of OpenAI
+});
 
-/**
- * Convert any text into an embedding vector (a list of ~1536 numbers
- * representing its meaning). Used for student profiles and topic descriptions.
- */
+
 export async function embed(text: string): Promise<number[]> {
   const response = await openai.embeddings.create({
     model: env.embeddingModel,
@@ -26,10 +16,7 @@ export async function embed(text: string): Promise<number[]> {
   return response.data[0].embedding;
 }
 
-/**
- * Measure how similar two vectors are, from 0 (unrelated) to 1 (identical).
- * This is pure math — no API call. Multiply by 100 to get the % match score.
- */
+
 export function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length) {
     throw new Error("Vectors must be the same length");
@@ -46,7 +33,6 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-/** Assemble a student's profile into a single string for embedding. */
 export function buildProfileText(profile: {
   skills?: string[];
   interests?: string;
@@ -61,7 +47,6 @@ export function buildProfileText(profile: {
   return parts.join(". ");
 }
 
-/** Generate a short natural-language summary of a student's academic profile. */
 export async function generateProfileSummary(profileText: string): Promise<string> {
   const response = await openai.chat.completions.create({
     model: env.chatModel,
@@ -78,7 +63,6 @@ export async function generateProfileSummary(profileText: string): Promise<strin
   return response.choices[0].message.content?.trim() ?? "";
 }
 
-/** Explain, in 2 sentences, why a student fits a given topic (shown to the tutor). */
 export async function generateMatchSummary(
   profileText: string,
   topicTitle: string,
@@ -102,7 +86,6 @@ export async function generateMatchSummary(
   return response.choices[0].message.content?.trim() ?? "";
 }
 
-/** Summarize an uploaded document and flag missing sections. */
 export async function analyzeDocument(
   documentText: string,
   requiredSections: string[]

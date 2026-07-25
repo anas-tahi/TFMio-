@@ -4,6 +4,9 @@ import { env } from "./config/env.js";
 import { connectDB } from "./config/db.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
+import studentRoutes from "./routes/student.routes.js";
+import topicRoutes from "./routes/topic.routes.js";
+import degreeRoutes from "./routes/degree.routes.js";
 
 async function start() {
   await connectDB();
@@ -20,7 +23,10 @@ async function start() {
 
   // Routes
   app.use("/api/auth", authRoutes);
-  // Phase 2 will add: /api/topics, /api/interests, /api/recommendations
+  app.use("/api/students", studentRoutes);
+  app.use("/api/topics", topicRoutes);
+  app.use("/api/degrees", degreeRoutes);
+  // Phase 2 will add: /api/interests, /api/recommendations
   // Phase 3 will add: /api/works, /api/documents, /api/notifications
 
   // Error handler must be last
