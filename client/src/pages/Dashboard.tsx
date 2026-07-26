@@ -80,12 +80,20 @@ export default function Dashboard() {
             Estas funciones se construirán en la Fase 2 y Fase 3.
           </p>
           {user.role === "student" && (
-            <a
-              href="/profile-setup"
-              className="inline-block mt-4 text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition"
-            >
-              Completar mi perfil →
-            </a>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <a
+                href="/profile-setup"
+                className="inline-block text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition"
+              >
+                Completar mi perfil →
+              </a>
+              <a
+                href="/recommendations"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Ver mis recomendaciones →
+              </a>
+            </div>
           )}
           {user.role === "tutor" && (
             <a

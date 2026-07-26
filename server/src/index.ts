@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import topicRoutes from "./routes/topic.routes.js";
 import degreeRoutes from "./routes/degree.routes.js";
+import recommendationRoutes from "./routes/recommendation.routes.js";
 
 async function start() {
   await connectDB();
@@ -26,8 +27,8 @@ async function start() {
   app.use("/api/students", studentRoutes);
   app.use("/api/topics", topicRoutes);
   app.use("/api/degrees", degreeRoutes);
-  // Phase 2 will add: /api/interests, /api/recommendations
-  // Phase 3 will add: /api/works, /api/documents, /api/notifications
+  app.use("/api/recommendations", recommendationRoutes);
+  // Phase 3 will add: /api/interests, /api/works, /api/documents, /api/notifications
 
   // Error handler must be last
   app.use(errorHandler);
