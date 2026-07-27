@@ -8,6 +8,7 @@ import studentRoutes from "./routes/student.routes.js";
 import topicRoutes from "./routes/topic.routes.js";
 import degreeRoutes from "./routes/degree.routes.js";
 import recommendationRoutes from "./routes/recommendation.routes.js";
+import interestRoutes from "./routes/interest.routes.js";
 
 async function start() {
   await connectDB();
@@ -17,20 +18,18 @@ async function start() {
   app.use(cors({ origin: env.clientUrl, credentials: true }));
   app.use(express.json());
 
-  // Health check
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", service: "TFMio API", time: new Date().toISOString() });
   });
 
-  // Routes
   app.use("/api/auth", authRoutes);
   app.use("/api/students", studentRoutes);
   app.use("/api/topics", topicRoutes);
   app.use("/api/degrees", degreeRoutes);
   app.use("/api/recommendations", recommendationRoutes);
-  // Phase 3 will add: /api/interests, /api/works, /api/documents, /api/notifications
+  app.use("/api/interests", interestRoutes);
+  // Phase 3 will add: /api/works, /api/documents, /api/notifications
 
-  // Error handler must be last
   app.use(errorHandler);
 
   app.listen(env.port, () => {

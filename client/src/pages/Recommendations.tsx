@@ -26,6 +26,8 @@ export default function Recommendations() {
   const [items, setItems] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // Tracks per-topic interest state: "idle" | "sending" | "sent" | "error"
+  const [interestState, setInterestState] = useState<Record<string, string>>({});
 
   useEffect(() => {
     api
@@ -38,6 +40,18 @@ export default function Recommendations() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  async function handleInterest(topicId: string) {
+    setInterestState((s) => ({ ...s, [topicId]: "sending" }));
+    try {
+      await api.post("/interests", { topicId });
+      setInterestState((s) => ({ ...s, [topicId]: "sent" }));
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "No se pudo enviar tu interés";
+      setInterestState((s) => ({ ...s, [topicId]: "error" }));
+      alert(msg);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-10">
@@ -67,44 +81,63 @@ export default function Recommendations() {
         )}
 
         <div className="space-y-3">
-          {items.map((topic, index) => (
-            <div
-              key={topic._id}
-              className={`bg-white rounded-2xl border p-5 ${
-                index === 0 ? "border-brand-mid" : "border-slate-200"
-              }`}
-            >
-              <div className="flex items-start justify-between gap-3 mb-2">
-                {index === 0 && (
-                  <span className="text-[10px] font-medium text-brand bg-brand-light px-2 py-0.5 rounded-full">
-                    Mejor recomendación
-                  </span>
-                )}
-                <span className="ml-auto text-xs font-semibold px-2.5 py-1 rounded-full bg-brand text-white">
-                  {topic.matchScore}% afinidad
-                </span>
-              </div>
-
-              <div className="text-sm font-medium text-slate-900">{topic.title}</div>
-              <div className="text-xs text-slate-500 mt-1">
-                {topic.tutor?.fullName} · {topic.department} · {topic.type}
-              </div>
-              <p className="text-xs text-slate-600 mt-2 leading-relaxed">{topic.description}</p>
-
-              {topic.skills && topic.skills.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-3">
-                  {topic.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200"
-                    >
-                      {skill}
+          {items.map((topic, index) => {
+            const state = interestState[topic._id] ?? "idle";
+            return (
+              <div
+                key={topic._id}
+                className={`bg-white rounded-2xl border p-5 ${
+                  index === 0 ? "border-brand-mid" : "border-slate-200"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  {index === 0 && (
+                    <span className="text-[10px] font-medium text-brand bg-brand-light px-2 py-0.5 rounded-full">
+                      Mejor recomendación
                     </span>
-                  ))}
+                  )}
+                  <span className="ml-auto text-xs font-semibold px-2.5 py-1 rounded-full bg-brand text-white">
+                    {topic.matchScore}% afinidad
+                  </span>
                 </div>
-              )}
-            </div>
-          ))}
+
+                <div className="text-sm font-medium text-slate-900">{topic.title}</div>
+                <div className="text-xs text-slate-500 mt-1">
+                  {topic.tutor?.fullName} · {topic.department} · {topic.type}
+                </div>
+                <p className="text-xs text-slate-600 mt-2 leading-relaxed">{topic.description}</p>
+
+                {topic.skills && topic.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-3">
+                    {topic.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-4">
+                  {state === "sent" ? (
+                    <span className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg inline-block">
+                      ✓ Interés enviado — el tutor lo revisará
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleInterest(topic._id)}
+                      disabled={state === "sending"}
+                      className="text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60"
+                    >
+                      {state === "sending" ? "Enviando…" : "Me interesa"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

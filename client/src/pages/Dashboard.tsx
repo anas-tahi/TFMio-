@@ -96,12 +96,20 @@ export default function Dashboard() {
             </div>
           )}
           {user.role === "tutor" && (
-            <a
-              href="/topics/new"
-              className="inline-block mt-4 text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition"
-            >
-              Publicar un tema →
-            </a>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <a
+                href="/topics/new"
+                className="inline-block text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition"
+              >
+                Publicar un tema →
+              </a>
+              <a
+                href="/requests"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Ver solicitudes de estudiantes →
+              </a>
+            </div>
           )}
         </div>
 
