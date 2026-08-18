@@ -36,6 +36,14 @@ export enum WorkStage {
   GRADED = "graded", // final grade entered
 }
 
+// ── Coordinator decision on a match ──
+export enum CoordinatorDecision {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  NOT_REVIEWED = "not_reviewed", // "no intervenir"
+}
+
 // ── Document type & status ──
 export enum DocumentType {
   PROPOSAL = "proposal",

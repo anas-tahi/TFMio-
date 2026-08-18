@@ -9,6 +9,8 @@ import topicRoutes from "./routes/topic.routes.js";
 import degreeRoutes from "./routes/degree.routes.js";
 import recommendationRoutes from "./routes/recommendation.routes.js";
 import interestRoutes from "./routes/interest.routes.js";
+import coordinatorRoutes from "./routes/coordinator.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 async function start() {
   await connectDB();
@@ -28,7 +30,9 @@ async function start() {
   app.use("/api/degrees", degreeRoutes);
   app.use("/api/recommendations", recommendationRoutes);
   app.use("/api/interests", interestRoutes);
-  // Phase 3 will add: /api/works, /api/documents, /api/notifications
+  app.use("/api/coordinator", coordinatorRoutes);
+  app.use("/api/notifications", notificationRoutes);
+  // Phase 3 will add: /api/documents
 
   app.use(errorHandler);
 

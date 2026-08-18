@@ -1,4 +1,5 @@
 import { useAuth } from "../store/auth";
+import NotificationBell from "../components/NotificationBell";
 
 const roleLabels: Record<string, string> = {
   student: "Estudiante",
@@ -18,8 +19,8 @@ const roleNextSteps: Record<string, string[]> = {
     "Supervisar tus trabajos activos",
   ],
   coordinator: [
-    "Ver el tablero de ciclo de vida",
-    "Aprobar emparejamientos y temas",
+    "Revisar emparejamientos pendientes",
+    "Aprobar, rechazar o no intervenir",
     "Programar defensas y gestionar calificaciones",
   ],
 };
@@ -43,6 +44,7 @@ export default function Dashboard() {
             {roleLabels[user.role]}
           </span>
           <div className="ml-auto flex items-center gap-3">
+            <NotificationBell />
             <span className="text-sm text-slate-600">{user.fullName}</span>
             <button
               onClick={logout}
@@ -59,7 +61,7 @@ export default function Dashboard() {
           Hola, {user.fullName.split(" ")[0]} 👋
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Bienvenido a TFMio. Esta es la base del proyecto — Fase 1 completada.
+          Bienvenido a TFMio.
         </p>
 
         <div className="mt-6 bg-white rounded-2xl border border-slate-200 p-6">
@@ -76,9 +78,6 @@ export default function Dashboard() {
               </li>
             ))}
           </ul>
-          <p className="text-xs text-slate-400 mt-4">
-            Estas funciones se construirán en la Fase 2 y Fase 3.
-          </p>
           {user.role === "student" && (
             <div className="flex flex-wrap gap-2 mt-4">
               <a
@@ -111,6 +110,16 @@ export default function Dashboard() {
               </a>
             </div>
           )}
+          {user.role === "coordinator" && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              <a
+                href="/coordinator/matches"
+                className="inline-block text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition"
+              >
+                Revisar emparejamientos →
+              </a>
+            </div>
+          )}
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-3">
@@ -121,13 +130,13 @@ export default function Dashboard() {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="text-xs text-slate-500">Fase 2</div>
-            <div className="text-sm font-medium text-slate-600 mt-1">Emparejamiento</div>
-            <div className="text-xs text-slate-400 mt-1">Próximamente</div>
+            <div className="text-sm font-medium text-green-700 mt-1">✓ Completada</div>
+            <div className="text-xs text-slate-400 mt-1">Emparejamiento con IA</div>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="text-xs text-slate-500">Fase 3</div>
             <div className="text-sm font-medium text-slate-600 mt-1">Ciclo de vida</div>
-            <div className="text-xs text-slate-400 mt-1">Próximamente</div>
+            <div className="text-xs text-slate-400 mt-1">En curso</div>
           </div>
         </div>
       </main>

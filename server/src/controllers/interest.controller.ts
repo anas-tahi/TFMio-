@@ -4,7 +4,10 @@ import { Topic } from "../models/Topic.js";
 import { User } from "../models/User.js";
 import { Work } from "../models/Work.js";
 import { cosineSimilarity, buildProfileText, generateMatchSummary } from "../services/llm.service.js";
-import { InterestStatus, TopicStatus, WorkStage } from "../types/index.js";
+import { InterestStatus, TopicStatus, WorkStage, NotificationType } from "../types/index.js";
+import { notify } from "../services/notification.service.js";
+
+const MAX_MATCHES_PER_TUTOR = 4;
 
 /**
  * Student expresses interest in a topic (feature: "Me interesa").
@@ -54,6 +57,14 @@ export async function createInterest(req: Request, res: Response, next: NextFunc
       studentNote,
     });
 
+    await notify({
+      recipient: topic.tutor,
+      type: NotificationType.INTEREST,
+      title: "Nuevo estudiante interesado",
+      message: `${student.fullName} ha mostrado interés en tu tema "${topic.title}"`,
+      link: "/requests",
+    });
+
     return res.status(201).json({ interest });
   } catch (err) {
     next(err);
@@ -80,7 +91,7 @@ export async function decideInterest(req: Request, res: Response, next: NextFunc
     const { id } = req.params;
     const { decision } = req.body as { decision: "accept" | "reject" };
 
-    const interest = await Interest.findById(id).populate("topic");
+    const interest = await Interest.findById(id).populate("topic").populate("student", "fullName");
     if (!interest) return res.status(404).json({ message: "Solicitud no encontrada" });
     if (interest.tutor.toString() !== req.user!.userId) {
       return res.status(403).json({ message: "No autorizado" });
@@ -89,17 +100,47 @@ export async function decideInterest(req: Request, res: Response, next: NextFunc
       return res.status(409).json({ message: "Esta solicitud ya fue procesada" });
     }
 
+    if (decision === "accept") {
+      const activeMatchCount = await Work.countDocuments({
+        tutor: interest.tutor,
+        stage: { $ne: WorkStage.GRADED }, // count anything not fully finished
+      });
+      if (activeMatchCount >= MAX_MATCHES_PER_TUTOR) {
+        return res.status(409).json({
+          message: `Ya tienes el máximo de ${MAX_MATCHES_PER_TUTOR} estudiantes asignados`,
+        });
+      }
+    }
+
     interest.status = decision === "accept" ? InterestStatus.ACCEPTED : InterestStatus.REJECTED;
     await interest.save();
 
+    const student = interest.student as unknown as { _id: string; fullName: string };
+    const topic = interest.topic as unknown as { _id: string; type: "TFM" | "TFG"; title: string };
+
     if (decision === "accept") {
-      const topic = interest.topic as unknown as { _id: string; type: "TFM" | "TFG" };
       await Work.create({
-        student: interest.student,
+        student: student._id,
         tutor: interest.tutor,
         topic: topic._id,
         type: topic.type,
         stage: WorkStage.MATCHED,
+      });
+
+      await notify({
+        recipient: student._id,
+        type: NotificationType.MATCH,
+        title: "¡Solicitud aceptada!",
+        message: `Tu tutor ha aceptado tu interés en "${topic.title}". Ahora está pendiente de aprobación por el coordinador.`,
+        link: "/",
+      });
+    } else {
+      await notify({
+        recipient: student._id,
+        type: NotificationType.INTEREST,
+        title: "Solicitud rechazada",
+        message: `Tu tutor ha rechazado tu interés en "${topic.title}"`,
+        link: "/recommendations",
       });
     }
 
