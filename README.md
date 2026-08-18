@@ -1,107 +1,110 @@
 # TFMio
 
-> Encuentra tu TFM. Gestiona tu camino.
+Encuentra tu TFM. Gestiona tu camino.
 
-Plataforma inteligente de emparejamiento y gestión integral de Trabajos Fin de Máster y Trabajos Fin de Grado — ETSIIT, Universidad de Granada.
+Plataforma de emparejamiento y gestion de Trabajos Fin de Master y Trabajos Fin de Grado, desarrollada para ETSIIT, Universidad de Granada.
 
-TFMio combines a Tinder-style topic discovery experience with an LLM-powered recommendation engine and a full lifecycle management system for TFM/TFG works, covering the entire process from finding a topic to receiving the final grade.
+Combina un sistema de descubrimiento de temas al estilo Tinder con un motor de recomendacion basado en modelos de lenguaje, ademas de un sistema de gestion del ciclo de vida completo del TFM/TFG: desde encontrar un tema hasta la calificacion final.
 
-**TFM autor:** Anas Tahir
-**Tutor:** Prof. Miguel García Silvente (DECSAI)
-**Programa:** Máster en Ingeniería Informática (MII)
+TFM autor: Anas Tahir
+Tutor: Prof. Miguel Garcia Silvente (DECSAI)
+Programa: Master en Ingenieria Informatica (MII)
 
 ---
 
-## Monorepo structure
+## Estado del proyecto
+
+Fase 1 (fundamentos) y Fase 2 (motor de emparejamiento con IA) completadas. Fase 3 (gestion del ciclo de vida) en curso. Fase 4 (pulido, tests, despliegue) pendiente.
+
+## Estructura del monorepo
 
 ```
 TFMio/
-├── server/     Node.js + Express + TypeScript API
-└── client/     React + Vite + TypeScript frontend
+├── server/     API en Node.js + Express + TypeScript
+└── client/     Frontend en React + Vite + TypeScript
 ```
 
-## Tech stack
+## Stack tecnologico
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React, Vite, TypeScript, Tailwind CSS, Zustand, TanStack Query |
-| Backend | Node.js, Express, TypeScript |
-| Database | MongoDB Atlas + Vector Search |
-| AI / LLM | OpenAI API (embeddings + chat), Vercel AI SDK |
-| Auth | JWT + bcrypt, role-based access control |
+- Frontend: React, Vite, TypeScript, Tailwind CSS, Zustand
+- Backend: Node.js, Express, TypeScript
+- Base de datos: MongoDB Atlas
+- IA: Ollama en local, usando llama3.2 para texto y nomic-embed-text para embeddings
+- Ranking de recomendaciones: similitud de coseno calculada directamente en Node.js
+- Auth: JWT + bcrypt, control de acceso por rol
 
-## Getting started
+El proyecto usa Ollama en lugar de la API de OpenAI para poder desarrollar sin coste. En vez de configurar el indice $vectorSearch de MongoDB Atlas, la similitud entre embeddings se calcula en el propio backend — mas simple de mantener y suficiente para el volumen de temas que maneja esta plataforma.
 
-### 1. Backend
+## Puesta en marcha
+
+### Backend
 
 ```bash
 cd server
-npm install
-cp .env.example .env        # then fill in your real values in .env
-npm run dev
-```
-
-The API runs on `http://localhost:5000`.
-
-### 2. Frontend
-
-```bash
-cd client
 npm install
 cp .env.example .env
 npm run dev
 ```
 
-The app runs on `http://localhost:5173`.
+API en `http://localhost:5000`.
+
+### Frontend
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+App en `http://localhost:5173`.
+
+### IA local (Ollama)
+
+Requiere Ollama (https://ollama.com) instalado y corriendo:
+
+```bash
+ollama pull llama3.2
+ollama pull nomic-embed-text
+```
 
 ## Roles
 
-- **Student** — discover topics, get AI recommendations, express interest, track their TFM
-- **Tutor** — publish topics, review student requests, supervise active works
-- **Coordinator** — oversee the full lifecycle, schedule defenses, manage grades
+- Estudiante: completa su perfil, recibe recomendaciones de IA, muestra interes en temas y sigue el progreso de su TFM/TFG
+- Tutor: publica temas, revisa solicitudes de estudiantes (con explicacion generada por IA) y decide si aceptarlas
+- Coordinador: supervisa el ciclo de vida completo de su titulacion — aprueba emparejamientos, programa defensas y gestiona calificaciones
 
-## Phase 1 status (this foundation)
+## Arquitectura multi-titulacion
 
-- [x] Monorepo structure
-- [x] MongoDB connection + all data models
-- [x] Degree (titulación) model — coordinators scoped per degree, per tutor feedback
-- [x] JWT auth (register/login) with role middleware
-- [x] OpenAI embedding pipeline (proof of concept)
-- [x] Seed script with realistic fake data (degrees, students, tutors, coordinators, topics)
-- [x] Frontend shell with routing and auth store
-- [ ] Phase 2 — matching engine + AI recommendations
-- [ ] Phase 3 — lifecycle management
-- [ ] Phase 4 — polish, testing, deployment
+La plataforma soporta varias titulaciones desde el principio, no como algo añadido despues:
 
-## Multi-degree architecture
+- Degree representa una titulacion (MII, GII, etc.), cada una con su propio coordinador
+- Cada estudiante pertenece a una titulacion
+- Un tutor puede supervisar en varias titulaciones
+- Cada coordinador esta vinculado a una sola titulacion y solo ve sus propios estudiantes y temas
+- Cada tema declara a que titulacion o titulaciones esta abierto
 
-Following the tutor's review, the platform supports multiple titulaciones (degrees)
-from day one, not as future work:
+## Motor de emparejamiento con IA
 
-- `Degree` — a titulación (e.g. MII, GII), each with its own coordinator
-- Students belong to exactly one degree
-- Tutors can supervise across several degrees
-- Coordinators are scoped to exactly one degree — they only see their own students/topics
-- Topics declare which degree(s) they're open to
+1. El perfil de cada estudiante (habilidades, intereses, estilo de trabajo) se convierte en un embedding con nomic-embed-text, y llama3.2 genera un resumen del perfil
+2. Cada tema publicado pasa por el mismo proceso
+3. La afinidad entre un estudiante y cada tema se calcula por similitud de coseno entre los embeddings, generando un ranking con porcentaje de coincidencia
+4. El estudiante explora sus recomendaciones con una interfaz de tarjetas deslizables
+5. Al mostrar interes en un tema, la IA genera una explicacion de por que ese estudiante encaja, que el tutor revisa antes de aceptar o rechazar la solicitud
+6. Si el tutor acepta, se crea un emparejamiento oficial (Work)
 
-## Seed data (development only)
+## Datos de prueba
 
-Everything in the database right now should be **fake data** — invented students,
-professors, and topics, never real people. This lets you build and test freely
-without any privacy concerns. Populate the database with:
+Todo lo que hay ahora mismo en la base de datos es informacion inventada: estudiantes, profesores y temas ficticios, nunca personas reales.
 
 ```bash
 cd server
 npm run seed
 ```
 
-This creates 3 degrees, 2 coordinators, 3 tutors, and 3 students with varied skill
-profiles, plus 4 topics — enough to test swiping, matching, and recommendations
-end to end. Every seeded account uses the password `Password123`.
+Este comando borra y reemplaza las colecciones de titulaciones, usuarios y temas. Crea 3 titulaciones, 2 coordinadores, 3 tutores, 3 estudiantes con perfiles variados y 4 temas — suficiente para probar el swipe, el emparejamiento y las recomendaciones de principio a fin. Todas las cuentas usan la contraseña Password123.
 
-When the platform is ready for real pilot testing with actual ETSIIT students and
-professors (with their consent), this fake data gets wiped and replaced.
+Cuando la plataforma este lista para pruebas piloto con estudiantes y profesores reales de ETSIIT (con su consentimiento), estos datos de prueba se eliminaran.
 
-## Security note
+## Seguridad
 
-Never commit your `.env` file. It is git-ignored by default. Only `.env.example` (with placeholder values) belongs in the repository.
+No subas tu archivo .env al repositorio. Esta en el .gitignore por defecto. Solo .env.example, con valores de ejemplo, debe estar en el repositorio.
