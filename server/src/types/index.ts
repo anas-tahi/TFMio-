@@ -66,3 +66,12 @@ export enum NotificationType {
   INTEREST = "interest",
   SYSTEM = "system",
 }
+
+// ── Student-proposed topic status ──
+export enum ProposalStatus {
+  PENDING = "pending", // waiting on tutor
+  REVISION_REQUESTED = "revision_requested", // tutor asked for changes
+  ACCEPTED = "accepted", // tutor accepted → becomes a Work, goes to coordinator
+  REJECTED = "rejected",
+
+}

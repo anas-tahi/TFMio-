@@ -92,6 +92,12 @@ export default function Dashboard() {
               >
                 Ver mis recomendaciones →
               </a>
+              <a
+                href="/propose-topic"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Proponer un tema →
+              </a>
             </div>
           )}
           {user.role === "tutor" && (
@@ -107,6 +113,12 @@ export default function Dashboard() {
                 className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
               >
                 Ver solicitudes de estudiantes →
+              </a>
+              <a
+                href="/proposals"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Ver propuestas de estudiantes →
               </a>
             </div>
           )}

@@ -9,6 +9,9 @@ import CreateTopic from "./pages/CreateTopic";
 import Recommendations from "./pages/Recommendations";
 import Requests from "./pages/Requests";
 import CoordinatorMatches from "./pages/CoordinatorMatches";
+import ProposeTopic from "./pages/ProposeTopic";
+import Proposals from "./pages/Proposals";
+import MyProposals from "./pages/MyProposals";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuth((s) => s.token);
@@ -85,6 +88,30 @@ export default function App() {
           element={
             <ProtectedRoute>
               <CoordinatorMatches />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/propose-topic"
+          element={
+            <ProtectedRoute>
+              <ProposeTopic />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/proposals"
+          element={
+            <ProtectedRoute>
+              <Proposals />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-proposals"
+          element={
+            <ProtectedRoute>
+              <MyProposals />
             </ProtectedRoute>
           }
         />

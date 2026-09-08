@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import { User } from "../models/User.js";
 import { embed, buildProfileText, generateProfileSummary } from "../services/llm.service.js";
+import { UserRole } from "../types/index.js";
 
 const updateProfileSchema = z.object({
   degree: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
@@ -53,6 +54,29 @@ export async function updateProfile(req: Request, res: Response, next: NextFunct
     }
 
     return res.json({ user: updatedUser });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * List tutors the logged-in student can propose a topic to, scoped to the
+ * student's own degree (a tutor can supervise multiple degrees, so we match
+ * on the student's degree being included in the tutor's degrees array).
+ */
+export async function getAvailableTutors(req: Request, res: Response, next: NextFunction) {
+  try {
+    const student = await User.findById(req.user!.userId);
+    if (!student?.degree) {
+      return res.status(400).json({ message: "Completa tu perfil primero" });
+    }
+
+    const tutors = await User.find({
+      role: UserRole.TUTOR,
+      degrees: student.degree,
+    }).select("fullName department");
+
+    return res.json({ tutors });
   } catch (err) {
     next(err);
   }
