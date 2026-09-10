@@ -8,6 +8,13 @@ export interface IDegree extends Document {
   school: string; // e.g. "ETSIIT"
   level: WorkType; // TFM (máster) or TFG (grado) — which kind of work this degree produces
   coordinator?: Types.ObjectId; // ref User (the coordinator scoped to this degree)
+
+  // ── Academic calendar, set by the coordinator ──
+  matchingDeadline?: Date; // students must have chosen a tutor/topic by this date
+  submissionDeadline?: Date; // final memoria must be submitted by this date
+  presentationPeriodStart?: Date; // defense window opens
+  presentationPeriodEnd?: Date; // defense window closes
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,6 +26,11 @@ const degreeSchema = new Schema<IDegree>(
     school: { type: String, required: true, default: "ETSIIT" },
     level: { type: String, enum: Object.values(WorkType), required: true },
     coordinator: { type: Schema.Types.ObjectId, ref: "User" },
+
+    matchingDeadline: { type: Date },
+    submissionDeadline: { type: Date },
+    presentationPeriodStart: { type: Date },
+    presentationPeriodEnd: { type: Date },
   },
   { timestamps: true }
 );

@@ -4,6 +4,7 @@ import { User } from "../models/User.js";
 import { Work } from "../models/Work.js";
 import { Topic } from "../models/Topic.js";
 import { Interest } from "../models/Interest.js";
+import { Degree } from "../models/Degree.js";
 import { ProposalStatus, WorkStage, TopicStatus, NotificationType, UserRole, InterestStatus } from "../types/index.js";
 import { notify } from "../services/notification.service.js";
 
@@ -13,6 +14,16 @@ const MAX_MATCHES_PER_TUTOR = 4;
 async function hasActiveMatch(studentId: string): Promise<boolean> {
   const count = await Work.countDocuments({ student: studentId });
   return count > 0;
+}
+
+/**
+ * Checks if the matching deadline for a student's degree has already passed.
+ */
+async function isPastMatchingDeadline(degreeId?: unknown): Promise<boolean> {
+  if (!degreeId) return false;
+  const degree = await Degree.findById(degreeId);
+  if (!degree?.matchingDeadline) return false;
+  return new Date() > degree.matchingDeadline;
 }
 
 /**
@@ -44,8 +55,16 @@ export async function createProposal(req: Request, res: Response, next: NextFunc
       type: "TFM" | "TFG";
     };
 
+    const student = await User.findById(req.user!.userId);
+
     if (await hasActiveMatch(req.user!.userId)) {
       return res.status(409).json({ message: "Ya tienes un tema asignado" });
+    }
+
+    if (await isPastMatchingDeadline(student?.degree)) {
+      return res.status(409).json({
+        message: "El plazo para elegir tutor ha finalizado. Contacta con tu coordinador.",
+      });
     }
 
     const tutor = await User.findOne({ _id: tutorId, role: UserRole.TUTOR });
@@ -59,8 +78,6 @@ export async function createProposal(req: Request, res: Response, next: NextFunc
       type,
       status: ProposalStatus.PENDING,
     });
-
-    const student = await User.findById(req.user!.userId);
 
     await notify({
       recipient: tutorId,

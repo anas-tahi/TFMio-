@@ -13,6 +13,9 @@ import coordinatorRoutes from "./routes/coordinator.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import proposalRoutes from "./routes/proposal.routes.js";
 import tutorDecisionRoutes from "./routes/tutorDecision.routes.js";
+import messageRoutes from "./routes/message.routes.js";
+import historyRoutes from "./routes/history.routes.js";
+import reportRoutes from "./routes/report.routes.js";
 
 async function start() {
   await connectDB();
@@ -36,6 +39,9 @@ async function start() {
   app.use("/api/notifications", notificationRoutes);
   app.use("/api/proposals", proposalRoutes);
   app.use("/api/final-decisions", tutorDecisionRoutes);
+  app.use("/api/messages", messageRoutes);
+  app.use("/api/history", historyRoutes);
+  app.use("/api/reports", reportRoutes);
   // Phase 3 will add: /api/documents
 
   app.use(errorHandler);

@@ -20,7 +20,7 @@ const roleNextSteps: Record<string, string[]> = {
   ],
   coordinator: [
     "Revisar emparejamientos pendientes",
-    "Aprobar, rechazar o no intervenir",
+    "Definir el calendario académico",
     "La decisión final la confirma el tutor",
   ],
 };
@@ -44,6 +44,13 @@ export default function Dashboard() {
             {roleLabels[user.role]}
           </span>
           <div className="ml-auto flex items-center gap-3">
+            <a
+              href="/chat"
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition text-lg"
+              aria-label="Mensajes"
+            >
+              💬
+            </a>
             <NotificationBell />
             <span className="text-sm text-slate-600">{user.fullName}</span>
             <button
@@ -60,9 +67,7 @@ export default function Dashboard() {
         <h1 className="text-2xl font-semibold text-slate-900">
           Hola, {user.fullName.split(" ")[0]} 👋
         </h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Bienvenido a TFMio.
-        </p>
+        <p className="text-sm text-slate-500 mt-1">Bienvenido a TFMio.</p>
 
         <div className="mt-6 bg-white rounded-2xl border border-slate-200 p-6">
           <h2 className="text-sm font-semibold text-slate-800 mb-3">
@@ -78,6 +83,7 @@ export default function Dashboard() {
               </li>
             ))}
           </ul>
+
           {user.role === "student" && (
             <div className="flex flex-wrap gap-2 mt-4">
               <a
@@ -98,8 +104,15 @@ export default function Dashboard() {
               >
                 Proponer un tema →
               </a>
+              <a
+                href="/chat"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Mensajes →
+              </a>
             </div>
           )}
+
           {user.role === "tutor" && (
             <div className="flex flex-wrap gap-2 mt-4">
               <a
@@ -126,8 +139,21 @@ export default function Dashboard() {
               >
                 Decisiones finales →
               </a>
+              <a
+                href="/history"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Historial →
+              </a>
+              <a
+                href="/chat"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Mensajes →
+              </a>
             </div>
           )}
+
           {user.role === "coordinator" && (
             <div className="flex flex-wrap gap-2 mt-4">
               <a
@@ -135,6 +161,18 @@ export default function Dashboard() {
                 className="inline-block text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition"
               >
                 Revisar emparejamientos →
+              </a>
+              <a
+                href="/coordinator/history"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Historial →
+              </a>
+              <a
+                href="/coordinator/calendar"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Calendario y plazos →
               </a>
             </div>
           )}

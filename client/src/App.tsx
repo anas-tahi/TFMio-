@@ -13,6 +13,11 @@ import ProposeTopic from "./pages/ProposeTopic";
 import Proposals from "./pages/Proposals";
 import MyProposals from "./pages/MyProposals";
 import FinalDecisions from "./pages/FinalDecisions";
+import ChatInbox from "./pages/ChatInbox";
+import Chat from "./pages/Chat";
+import TutorHistory from "./pages/TutorHistory";
+import CoordinatorHistory from "./pages/CoordinatorHistory";
+import CoordinatorCalendar from "./pages/CoordinatorCalendar";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuth((s) => s.token);
@@ -121,6 +126,46 @@ export default function App() {
           element={
             <ProtectedRoute>
               <FinalDecisions />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <ChatInbox />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat/:workId"
+          element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <TutorHistory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coordinator/history"
+          element={
+            <ProtectedRoute>
+              <CoordinatorHistory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coordinator/calendar"
+          element={
+            <ProtectedRoute>
+              <CoordinatorCalendar />
             </ProtectedRoute>
           }
         />
