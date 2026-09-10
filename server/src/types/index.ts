@@ -55,6 +55,7 @@ export enum TutorFinalDecision {
 // ── Document type & status ──
 export enum DocumentType {
   PROPOSAL = "proposal",
+  PROGRESS_REPORT = "progress_report",
   MEMORY = "memory",
 }
 
@@ -81,4 +82,10 @@ export enum ProposalStatus {
   REVISION_REQUESTED = "revision_requested", // tutor asked for changes
   ACCEPTED = "accepted", // tutor accepted → becomes a Work, goes to coordinator
   REJECTED = "rejected",
+}
+
+// ── Which role a rubric applies to ──
+export enum RubricRole {
+  TUTOR = "tutor",
+  JURY = "jury",
 }

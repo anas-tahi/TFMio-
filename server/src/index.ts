@@ -16,6 +16,10 @@ import tutorDecisionRoutes from "./routes/tutorDecision.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import historyRoutes from "./routes/history.routes.js";
 import reportRoutes from "./routes/report.routes.js";
+import documentRoutes from "./routes/document.routes.js";
+import defenseRoutes from "./routes/defense.routes.js";
+import rubricRoutes from "./routes/rubric.routes.js";
+import gradeRoutes from "./routes/grade.routes.js";
 
 async function start() {
   await connectDB();
@@ -42,7 +46,10 @@ async function start() {
   app.use("/api/messages", messageRoutes);
   app.use("/api/history", historyRoutes);
   app.use("/api/reports", reportRoutes);
-  // Phase 3 will add: /api/documents
+  app.use("/api/documents", documentRoutes);
+  app.use("/api/defense", defenseRoutes);
+  app.use("/api/rubrics", rubricRoutes);
+  app.use("/api/grades", gradeRoutes);
 
   app.use(errorHandler);
 

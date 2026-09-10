@@ -20,8 +20,8 @@ const roleNextSteps: Record<string, string[]> = {
   ],
   coordinator: [
     "Revisar emparejamientos pendientes",
-    "Definir el calendario académico",
-    "La decisión final la confirma el tutor",
+    "Definir el calendario y las rúbricas de evaluación",
+    "Programar defensas cuando la memoria esté aprobada",
   ],
 };
 
@@ -174,6 +174,18 @@ export default function Dashboard() {
               >
                 Calendario y plazos →
               </a>
+              <a
+                href="/coordinator/defense"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Programar defensas →
+              </a>
+              <a
+                href="/coordinator/rubrics"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Rúbricas de calificación →
+              </a>
             </div>
           )}
         </div>
@@ -191,8 +203,8 @@ export default function Dashboard() {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="text-xs text-slate-500">Fase 3</div>
-            <div className="text-sm font-medium text-slate-600 mt-1">Ciclo de vida</div>
-            <div className="text-xs text-slate-400 mt-1">En curso</div>
+            <div className="text-sm font-medium text-green-700 mt-1">✓ Completada</div>
+            <div className="text-xs text-slate-400 mt-1">Ciclo de vida completo</div>
           </div>
         </div>
       </main>

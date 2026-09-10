@@ -18,6 +18,10 @@ import Chat from "./pages/Chat";
 import TutorHistory from "./pages/TutorHistory";
 import CoordinatorHistory from "./pages/CoordinatorHistory";
 import CoordinatorCalendar from "./pages/CoordinatorCalendar";
+import Documents from "./pages/Documents";
+import ScheduleDefense from "./pages/ScheduleDefense";
+import RubricEditor from "./pages/RubricEditor";
+import GradeWork from "./pages/GradeWork";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuth((s) => s.token);
@@ -166,6 +170,38 @@ export default function App() {
           element={
             <ProtectedRoute>
               <CoordinatorCalendar />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/works/:workId/documents"
+          element={
+            <ProtectedRoute>
+              <Documents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coordinator/defense"
+          element={
+            <ProtectedRoute>
+              <ScheduleDefense />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coordinator/rubrics"
+          element={
+            <ProtectedRoute>
+              <RubricEditor />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/works/:workId/grade"
+          element={
+            <ProtectedRoute>
+              <GradeWork />
             </ProtectedRoute>
           }
         />
