@@ -16,12 +16,12 @@ const roleNextSteps: Record<string, string[]> = {
   tutor: [
     "Publicar tus temas de TFM/TFG",
     "Revisar solicitudes de estudiantes",
-    "Supervisar tus trabajos activos",
+    "Confirmar la decisión final tras la revisión del coordinador",
   ],
   coordinator: [
     "Revisar emparejamientos pendientes",
     "Aprobar, rechazar o no intervenir",
-    "Programar defensas y gestionar calificaciones",
+    "La decisión final la confirma el tutor",
   ],
 };
 
@@ -119,6 +119,12 @@ export default function Dashboard() {
                 className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
               >
                 Ver propuestas de estudiantes →
+              </a>
+              <a
+                href="/final-decisions"
+                className="inline-block text-xs px-4 py-2 rounded-lg border border-brand text-brand font-medium hover:bg-brand-light transition"
+              >
+                Decisiones finales →
               </a>
             </div>
           )}

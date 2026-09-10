@@ -31,7 +31,11 @@ export async function getPendingMatches(req: Request, res: Response, next: NextF
   }
 }
 
-/** Coordinator: approve, reject, or explicitly not intervene on a match. */
+/**
+ * Coordinator: give their input on a match — approve as-is, reject, or not
+ * intervene. This is NOT the final decision anymore: it always goes back to
+ * the tutor, who has the real final say after seeing the coordinator's note.
+ */
 export async function decideMatch(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
@@ -48,9 +52,6 @@ export async function decideMatch(req: Request, res: Response, next: NextFunctio
     if (!work) return res.status(404).json({ message: "No encontrado" });
 
     work.coordinatorDecision = decision;
-    if (decision === CoordinatorDecision.APPROVED) {
-      work.approvedByCoordinator = true;
-    }
     if (note) work.coordinatorNote = note;
     await work.save();
 
@@ -66,16 +67,15 @@ export async function decideMatch(req: Request, res: Response, next: NextFunctio
     const label = decisionLabels[decision] ?? decision;
     const noteText = note ? ` Nota del coordinador: "${note}"` : "";
 
-    // Notify both the student and the tutor — the coordinator's note reaches both.
-    for (const recipient of [student._id, tutor._id]) {
-      await notify({
-        recipient,
-        type: NotificationType.APPROVAL,
-        title: `Emparejamiento ${label}`,
-        message: `El coordinador ha ${label} el emparejamiento para "${topic.title}".${noteText}`,
-        link: "/",
-      });
-    }
+    // Only the tutor is notified here — they need to give the final decision.
+    // The student hears about it once the tutor confirms or cancels.
+    await notify({
+      recipient: tutor._id,
+      type: NotificationType.APPROVAL,
+      title: `El coordinador ha revisado el emparejamiento`,
+      message: `Para "${topic.title}" con ${student.fullName}: ${label}.${noteText} Confirma la decisión final.`,
+      link: "/final-decisions",
+    });
 
     return res.json({ work });
   } catch (err) {

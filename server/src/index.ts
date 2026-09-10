@@ -12,6 +12,7 @@ import interestRoutes from "./routes/interest.routes.js";
 import coordinatorRoutes from "./routes/coordinator.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import proposalRoutes from "./routes/proposal.routes.js";
+import tutorDecisionRoutes from "./routes/tutorDecision.routes.js";
 
 async function start() {
   await connectDB();
@@ -34,6 +35,7 @@ async function start() {
   app.use("/api/coordinator", coordinatorRoutes);
   app.use("/api/notifications", notificationRoutes);
   app.use("/api/proposals", proposalRoutes);
+  app.use("/api/final-decisions", tutorDecisionRoutes);
   // Phase 3 will add: /api/documents
 
   app.use(errorHandler);

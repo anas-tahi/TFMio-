@@ -3,10 +3,36 @@ import { TopicProposal } from "../models/TopicProposal.js";
 import { User } from "../models/User.js";
 import { Work } from "../models/Work.js";
 import { Topic } from "../models/Topic.js";
-import { ProposalStatus, WorkStage, TopicStatus, NotificationType, UserRole } from "../types/index.js";
+import { Interest } from "../models/Interest.js";
+import { ProposalStatus, WorkStage, TopicStatus, NotificationType, UserRole, InterestStatus } from "../types/index.js";
 import { notify } from "../services/notification.service.js";
 
 const MAX_MATCHES_PER_TUTOR = 4;
+
+/** True if the student already has an active match (not rejected/closed). */
+async function hasActiveMatch(studentId: string): Promise<boolean> {
+  const count = await Work.countDocuments({ student: studentId });
+  return count > 0;
+}
+
+/**
+ * Cancels every other pending interest/proposal a student has, once one of
+ * theirs gets accepted — since a student can only work on one topic at a time.
+ */
+async function cancelOtherPendingRequests(studentId: string, keepProposalId?: string) {
+  await Interest.updateMany(
+    { student: studentId, status: InterestStatus.PENDING },
+    { status: InterestStatus.REJECTED }
+  );
+  await TopicProposal.updateMany(
+    {
+      student: studentId,
+      status: { $in: [ProposalStatus.PENDING, ProposalStatus.REVISION_REQUESTED] },
+      ...(keepProposalId ? { _id: { $ne: keepProposalId } } : {}),
+    },
+    { status: ProposalStatus.REJECTED }
+  );
+}
 
 /** Student: propose a new topic idea to a specific tutor. */
 export async function createProposal(req: Request, res: Response, next: NextFunction) {
@@ -17,6 +43,10 @@ export async function createProposal(req: Request, res: Response, next: NextFunc
       description: string;
       type: "TFM" | "TFG";
     };
+
+    if (await hasActiveMatch(req.user!.userId)) {
+      return res.status(409).json({ message: "Ya tienes un tema asignado" });
+    }
 
     const tutor = await User.findOne({ _id: tutorId, role: UserRole.TUTOR });
     if (!tutor) return res.status(404).json({ message: "Tutor no encontrado" });
@@ -159,6 +189,10 @@ export async function decideProposal(req: Request, res: Response, next: NextFunc
     }
 
     // decision === "accept"
+    if (await hasActiveMatch(student._id)) {
+      return res.status(409).json({ message: "Este estudiante ya tiene un tema asignado" });
+    }
+
     const activeMatchCount = await Work.countDocuments({
       tutor: proposal.tutor,
       stage: { $ne: WorkStage.GRADED },
@@ -199,6 +233,9 @@ export async function decideProposal(req: Request, res: Response, next: NextFunc
       type: proposal.type,
       stage: WorkStage.MATCHED,
     });
+
+    // A student can only work on one topic — cancel any other pending requests they have.
+    await cancelOtherPendingRequests(student._id, proposal._id.toString());
 
     await notify({
       recipient: student._id,

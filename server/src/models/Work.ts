@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
-import { WorkType, WorkStage, CoordinatorDecision } from "../types/index.js";
+import { WorkType, WorkStage, CoordinatorDecision, TutorFinalDecision } from "../types/index.js";
 
 interface IDefense {
   date?: Date;
@@ -26,6 +26,7 @@ export interface IWork extends Document {
   approvedByCoordinator: boolean;
   coordinatorDecision: CoordinatorDecision;
   coordinatorNote?: string;
+  tutorFinalDecision: TutorFinalDecision;
 
   defense: IDefense;
   grade: IGrade;
@@ -50,6 +51,12 @@ const workSchema = new Schema<IWork>(
       index: true,
     },
     coordinatorNote: { type: String, trim: true },
+    tutorFinalDecision: {
+      type: String,
+      enum: Object.values(TutorFinalDecision),
+      default: TutorFinalDecision.PENDING,
+      index: true,
+    },
 
     defense: {
       date: { type: Date },

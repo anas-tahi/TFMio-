@@ -12,6 +12,7 @@ import CoordinatorMatches from "./pages/CoordinatorMatches";
 import ProposeTopic from "./pages/ProposeTopic";
 import Proposals from "./pages/Proposals";
 import MyProposals from "./pages/MyProposals";
+import FinalDecisions from "./pages/FinalDecisions";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuth((s) => s.token);
@@ -112,6 +113,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <MyProposals />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/final-decisions"
+          element={
+            <ProtectedRoute>
+              <FinalDecisions />
             </ProtectedRoute>
           }
         />

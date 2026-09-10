@@ -3,11 +3,37 @@ import { Interest } from "../models/Interest.js";
 import { Topic } from "../models/Topic.js";
 import { User } from "../models/User.js";
 import { Work } from "../models/Work.js";
+import { TopicProposal } from "../models/TopicProposal.js";
 import { cosineSimilarity, buildProfileText, generateMatchSummary } from "../services/llm.service.js";
-import { InterestStatus, TopicStatus, WorkStage, NotificationType } from "../types/index.js";
+import { InterestStatus, TopicStatus, WorkStage, NotificationType, ProposalStatus } from "../types/index.js";
 import { notify } from "../services/notification.service.js";
 
 const MAX_MATCHES_PER_TUTOR = 4;
+
+/** True if the student already has an active match (not rejected/closed). */
+async function hasActiveMatch(studentId: string): Promise<boolean> {
+  const count = await Work.countDocuments({ student: studentId });
+  return count > 0;
+}
+
+/**
+ * Cancels every other pending interest/proposal a student has, once one of
+ * theirs gets accepted — since a student can only work on one topic at a time.
+ */
+async function cancelOtherPendingRequests(studentId: string, keepInterestId?: string) {
+  await Interest.updateMany(
+    {
+      student: studentId,
+      status: InterestStatus.PENDING,
+      ...(keepInterestId ? { _id: { $ne: keepInterestId } } : {}),
+    },
+    { status: InterestStatus.REJECTED }
+  );
+  await TopicProposal.updateMany(
+    { student: studentId, status: { $in: [ProposalStatus.PENDING, ProposalStatus.REVISION_REQUESTED] } },
+    { status: ProposalStatus.REJECTED }
+  );
+}
 
 /**
  * Student expresses interest in a topic (feature: "Me interesa").
@@ -22,6 +48,10 @@ export async function createInterest(req: Request, res: Response, next: NextFunc
     if (!student) return res.status(404).json({ message: "Student not found" });
     if (!student.embedding || student.embedding.length === 0) {
       return res.status(400).json({ message: "Completa tu perfil primero" });
+    }
+
+    if (await hasActiveMatch(student._id.toString())) {
+      return res.status(409).json({ message: "Ya tienes un tema asignado" });
     }
 
     const topic = await Topic.findById(topicId).select("+embedding");
@@ -100,6 +130,9 @@ export async function decideInterest(req: Request, res: Response, next: NextFunc
       return res.status(409).json({ message: "Esta solicitud ya fue procesada" });
     }
 
+    const student = interest.student as unknown as { _id: string; fullName: string };
+    const topic = interest.topic as unknown as { _id: string; type: "TFM" | "TFG"; title: string };
+
     if (decision === "accept") {
       const activeMatchCount = await Work.countDocuments({
         tutor: interest.tutor,
@@ -110,13 +143,13 @@ export async function decideInterest(req: Request, res: Response, next: NextFunc
           message: `Ya tienes el máximo de ${MAX_MATCHES_PER_TUTOR} estudiantes asignados`,
         });
       }
+      if (await hasActiveMatch(student._id)) {
+        return res.status(409).json({ message: "Este estudiante ya tiene un tema asignado" });
+      }
     }
 
     interest.status = decision === "accept" ? InterestStatus.ACCEPTED : InterestStatus.REJECTED;
     await interest.save();
-
-    const student = interest.student as unknown as { _id: string; fullName: string };
-    const topic = interest.topic as unknown as { _id: string; type: "TFM" | "TFG"; title: string };
 
     if (decision === "accept") {
       await Work.create({
@@ -126,6 +159,9 @@ export async function decideInterest(req: Request, res: Response, next: NextFunc
         type: topic.type,
         stage: WorkStage.MATCHED,
       });
+
+      // A student can only work on one topic — cancel any other pending requests they have.
+      await cancelOtherPendingRequests(student._id, interest._id.toString());
 
       await notify({
         recipient: student._id,
