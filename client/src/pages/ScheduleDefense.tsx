@@ -32,7 +32,7 @@ export default function ScheduleDefense() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [formState, setFormState] = useState
+  const [formState, setFormState] = useState<
     Record<string, { date: string; time: string; room: string; jury: string[] }>
   >({});
   const [submitting, setSubmitting] = useState<Record<string, boolean>>({});
@@ -58,7 +58,7 @@ export default function ScheduleDefense() {
   function updateForm(workId: string, field: string, value: string | string[]) {
     setFormState((s) => ({
       ...s,
-      [workId]: { date: "", time: "", room: "", jury: [], ...s[workId], [field]: value },
+      [workId]: { ...{ date: "", time: "", room: "", jury: [] }, ...s[workId], [field]: value },
     }));
   }
 

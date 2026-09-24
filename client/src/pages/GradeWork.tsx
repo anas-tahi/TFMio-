@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../lib/api";
-import { useAuth } from "../store/auth";
 
 interface Criterion {
   name: string;
@@ -15,9 +14,8 @@ interface Rubric {
 
 export default function GradeWork() {
   const { workId } = useParams<{ workId: string }>();
-  const user = useAuth((s) => s.user);
-  const role = user?.role === "tutor" ? "tutor" : "jury";
 
+  const [role, setRole] = useState<"tutor" | "jury" | null>(null);
   const [rubric, setRubric] = useState<Rubric | null>(null);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
@@ -25,14 +23,51 @@ export default function GradeWork() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Step 1: ask the backend which role THIS specific user has for THIS
+  // specific work — never guess from the account's general role, since a
+  // tutor account can also be a jury member on someone else's defense.
   useEffect(() => {
+    if (!workId) return;
+    let cancelled = false;
+    api
+      .get<{ role: "tutor" | "jury" }>(`/grades/${workId}/my-role`)
+      .then((res) => {
+        if (!cancelled) setRole(res.data.role);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err?.response?.data?.message || "No autorizado para calificar este trabajo");
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [workId]);
+
+  // Step 2: once we know the confirmed role, fetch the matching rubric.
+  useEffect(() => {
+    if (!workId || !role) return;
+    let cancelled = false;
+    setLoading(true);
+
     api
       .get<{ rubric: Rubric }>(`/grades/${workId}/rubric/${role}`)
-      .then((res) => setRubric(res.data.rubric))
-      .catch((err) => {
-        setError(err?.response?.data?.message || "No se pudo cargar la rúbrica");
+      .then((res) => {
+        if (!cancelled) setRubric(res.data.rubric);
       })
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err?.response?.data?.message || "No se pudo cargar la rúbrica");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [workId, role]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -81,7 +116,7 @@ export default function GradeWork() {
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Calificar trabajo</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Evaluación como {role === "tutor" ? "tutor" : "miembro del tribunal"}.
+            {role ? `Evaluación como ${role === "tutor" ? "tutor" : "miembro del tribunal"}.` : ""}
           </p>
           <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>

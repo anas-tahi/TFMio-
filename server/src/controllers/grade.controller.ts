@@ -6,6 +6,24 @@ import { User } from "../models/User.js";
 import { RubricRole, WorkStage, NotificationType } from "../types/index.js";
 import { notify } from "../services/notification.service.js";
 
+/** Tells the caller whether they are the tutor or a jury member for this specific work. */
+export async function getMyRoleForWork(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { workId } = req.params;
+    const work = await Work.findById(workId);
+    if (!work) return res.status(404).json({ message: "No encontrado" });
+
+    const isTutor = work.tutor.toString() === req.user!.userId;
+    const isJury = (work.defense?.jury ?? []).some((j) => j.toString() === req.user!.userId);
+
+    if (!isTutor && !isJury) return res.status(403).json({ message: "No autorizado" });
+
+    return res.json({ role: isTutor ? "tutor" : "jury" });
+  } catch (err) {
+    next(err);
+  }
+}
+
 /** Anyone involved (tutor or jury member) fetches the rubric they need to grade with. */
 export async function getRubricForGrading(req: Request, res: Response, next: NextFunction) {
   try {
