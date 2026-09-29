@@ -25,6 +25,17 @@ const loginSchema = z.object({
   password: z.string(),
 });
 
+const verifyActivationSchema = z.object({
+  email: z.string().email(),
+  code: z.string().length(6),
+});
+
+const setPasswordSchema = z.object({
+  email: z.string().email(),
+  code: z.string().length(6),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
 export async function register(req: Request, res: Response, next: NextFunction) {
   try {
     const data = registerSchema.parse(req.body);
@@ -35,7 +46,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     }
 
     const hashed = await bcrypt.hash(data.password, 10);
-    const user = await User.create({ ...data, password: hashed });
+    const user = await User.create({ ...data, password: hashed, isActivated: true });
 
     const token = signToken({ userId: user._id.toString(), role: user.role });
     return res.status(201).json({ token, user });
@@ -49,7 +60,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const { email, password } = loginSchema.parse(req.body);
 
     const user = await User.findOne({ email }).select("+password");
-    if (!user) {
+    if (!user || !user.password) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
@@ -70,6 +81,63 @@ export async function me(req: Request, res: Response, next: NextFunction) {
     const user = await User.findById(req.user!.userId);
     if (!user) return res.status(404).json({ message: "User not found" });
     return res.json({ user });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Step 1 of activation: verify that an email + activation code match a
+ * pre-created, not-yet-activated account. Does not log the user in or
+ * change anything — just confirms they can proceed to set a password.
+ */
+export async function verifyActivation(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { email, code } = verifyActivationSchema.parse(req.body);
+
+    const user = await User.findOne({ email: email.toLowerCase() }).select("+activationCode");
+    if (!user) {
+      return res.status(404).json({ message: "No existe una cuenta con ese email" });
+    }
+    if (user.isActivated) {
+      return res.status(409).json({ message: "Esta cuenta ya está activada. Inicia sesión normalmente." });
+    }
+    if (user.activationCode !== code) {
+      return res.status(401).json({ message: "Código incorrecto" });
+    }
+
+    return res.json({ fullName: user.fullName, role: user.role });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Step 2 of activation: given a verified email + code, set the real
+ * password, mark the account activated, and permanently invalidate the code.
+ */
+export async function completeActivation(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { email, code, password } = setPasswordSchema.parse(req.body);
+
+    const user = await User.findOne({ email: email.toLowerCase() }).select("+activationCode");
+    if (!user) {
+      return res.status(404).json({ message: "No existe una cuenta con ese email" });
+    }
+    if (user.isActivated) {
+      return res.status(409).json({ message: "Esta cuenta ya está activada" });
+    }
+    if (user.activationCode !== code) {
+      return res.status(401).json({ message: "Código incorrecto" });
+    }
+
+    user.password = await bcrypt.hash(password, 10);
+    user.isActivated = true;
+    user.activationCode = undefined; // permanently invalidate the code
+    await user.save();
+
+    const token = signToken({ userId: user._id.toString(), role: user.role });
+    return res.status(201).json({ token, user });
   } catch (err) {
     next(err);
   }

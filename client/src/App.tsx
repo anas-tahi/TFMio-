@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./store/auth";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Activate from "./pages/Activate";
 import Dashboard from "./pages/Dashboard";
 import ProfileSetup from "./pages/ProfileSetup";
 import CreateTopic from "./pages/CreateTopic";
@@ -58,6 +59,14 @@ export default function App() {
           element={
             <PublicOnlyRoute>
               <Register />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/activate"
+          element={
+            <PublicOnlyRoute>
+              <Activate />
             </PublicOnlyRoute>
           }
         />

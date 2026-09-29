@@ -72,6 +72,12 @@ export default function Login() {
           </button>
 
           <p className="text-center text-xs text-slate-500 mt-4">
+            ¿Tienes un código de activación de la universidad?{" "}
+            <Link to="/activate" className="text-brand font-medium">
+              Activa tu cuenta
+            </Link>
+          </p>
+          <p className="text-center text-xs text-slate-500 mt-2">
             ¿No tienes cuenta?{" "}
             <Link to="/register" className="text-brand font-medium">
               Regístrate

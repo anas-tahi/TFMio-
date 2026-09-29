@@ -1,0 +1,60 @@
+fullName,email,role,activationCode,degreeShortName
+Javier Molina,javier.molina0@correo.ugr.es,student,148657,MII
+Laura Pérez,laura.perez1@correo.ugr.es,student,374433,GII
+Diego Moreno,diego.moreno2@correo.ugr.es,student,284497,MCDIC
+Carlos Pérez,carlos.perez3@correo.ugr.es,student,606421,MII
+Marta Moreno,marta.moreno4@correo.ugr.es,student,359520,GII
+Sara Serrano,sara.serrano5@correo.ugr.es,student,104923,MCDIC
+Laura Díaz,laura.diaz6@correo.ugr.es,student,427132,MII
+Sergio Romero,sergio.romero7@correo.ugr.es,student,672644,GII
+Adrián Navarro,adrian.navarro8@correo.ugr.es,student,223456,MCDIC
+Beatriz Moreno,beatriz.moreno9@correo.ugr.es,student,733321,MII
+Hugo Ruiz,hugo.ruiz10@correo.ugr.es,student,221758,GII
+Sergio Gómez,sergio.gomez11@correo.ugr.es,student,361664,MCDIC
+Sergio Ramos,sergio.ramos12@correo.ugr.es,student,615523,MII
+Irene Gómez,irene.gomez13@correo.ugr.es,student,605529,GII
+Adrián Molina,adrian.molina14@correo.ugr.es,student,480837,MCDIC
+Diego Torres,diego.torres15@correo.ugr.es,student,800689,MII
+Pablo Domínguez,pablo.dominguez16@correo.ugr.es,student,161567,GII
+Ana Díaz,ana.diaz17@correo.ugr.es,student,388230,MCDIC
+Ana Álvarez,ana.alvarez18@correo.ugr.es,student,215636,MII
+Laura Ruiz,laura.ruiz19@correo.ugr.es,student,633978,GII
+Diego Díaz,diego.diaz20@correo.ugr.es,student,292113,MCDIC
+David Fernández,david.fernandez21@correo.ugr.es,student,671911,MII
+Diego Moreno,diego.moreno22@correo.ugr.es,student,398300,GII
+Beatriz Molina,beatriz.molina23@correo.ugr.es,student,599451,MCDIC
+Laura Molina,laura.molina24@correo.ugr.es,student,183800,MII
+Beatriz Fernández,beatriz.fernandez25@correo.ugr.es,student,440271,GII
+Claudia Sánchez,claudia.sanchez26@correo.ugr.es,student,378953,MCDIC
+Elena López,elena.lopez27@correo.ugr.es,student,659018,MII
+Elena Navarro,elena.navarro28@correo.ugr.es,student,844467,GII
+Claudia Torres,claudia.torres29@correo.ugr.es,student,583942,MCDIC
+Claudia Pérez,claudia.perez30@correo.ugr.es,student,876151,MII
+Hugo López,hugo.lopez31@correo.ugr.es,student,943955,GII
+Marta Ramos,marta.ramos32@correo.ugr.es,student,305692,MCDIC
+Diego López,diego.lopez33@correo.ugr.es,student,950736,MII
+Carlos Álvarez,carlos.alvarez34@correo.ugr.es,student,569443,GII
+Elena Fernández,elena.fernandez35@correo.ugr.es,student,773122,MCDIC
+Beatriz Álvarez,beatriz.alvarez36@correo.ugr.es,student,503109,MII
+Beatriz Moreno,beatriz.moreno37@correo.ugr.es,student,779384,GII
+Lucía Torres,lucia.torres38@correo.ugr.es,student,438684,MCDIC
+Hugo Sánchez,hugo.sanchez39@correo.ugr.es,student,308747,MII
+Diego Ramos,diego.ramos40@correo.ugr.es,student,503740,GII
+Laura Serrano,laura.serrano41@correo.ugr.es,student,305891,MCDIC
+Sergio Serrano,sergio.serrano42@correo.ugr.es,student,337321,MII
+Paula Gómez,paula.gomez43@correo.ugr.es,student,355486,GII
+Beatriz Serrano,beatriz.serrano44@correo.ugr.es,student,188359,MCDIC
+Paula Pérez,paula.perez45@correo.ugr.es,student,240208,MII
+Alejandro Pérez,alejandro.perez46@correo.ugr.es,student,834559,GII
+Beatriz Díaz,beatriz.diaz47@correo.ugr.es,student,145615,MCDIC
+Hugo Domínguez,hugo.dominguez48@correo.ugr.es,student,180645,MII
+Hugo Torres,hugo.torres49@correo.ugr.es,student,208350,GII
+Prof. Diego Ramos,diego.ramos0@ugr.es,tutor,940514,MII
+Prof. Lucía Martínez,lucia.martinez1@ugr.es,tutor,328156,GII
+Prof. Hugo Molina,hugo.molina2@ugr.es,tutor,672305,MCDIC
+Prof. Diego Domínguez,diego.dominguez3@ugr.es,tutor,273023,MII
+Prof. Diego Molina,diego.molina4@ugr.es,tutor,487095,GII
+Prof. David López,david.lopez5@ugr.es,tutor,867982,MCDIC
+Prof. Sara Moreno,sara.moreno0@ugr.es,coordinator,403306,MII
+Prof. Ana Vázquez,ana.vazquez1@ugr.es,coordinator,577002,GII
+Prof. Irene Gómez,irene.gomez2@ugr.es,coordinator,579877,MCDIC

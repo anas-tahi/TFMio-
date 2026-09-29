@@ -4,9 +4,13 @@ import { UserRole } from "../types/index.js";
 export interface IUser extends Document {
   _id: Types.ObjectId;
   email: string;
-  password: string;
+  password?: string; // absent until the user activates their account
   fullName: string;
   role: UserRole;
+
+  // ── Account activation ──
+  activationCode?: string; // 6-digit code given by the administration, used once
+  isActivated: boolean;
 
   // ── Student-specific fields ──
   degree?: Types.ObjectId; // ref Degree — the student's own titulación
@@ -32,9 +36,12 @@ export interface IUser extends Document {
 const userSchema = new Schema<IUser>(
   {
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true },
+    password: { type: String }, // set only after activation
     fullName: { type: String, required: true, trim: true },
     role: { type: String, enum: Object.values(UserRole), required: true },
+
+    activationCode: { type: String, select: false },
+    isActivated: { type: Boolean, default: false },
 
     // Student
     degree: { type: Schema.Types.ObjectId, ref: "Degree" },
@@ -61,6 +68,7 @@ userSchema.set("toJSON", {
   transform: (_doc, ret: any) => {
     delete ret.password;
     delete ret.embedding;
+    delete ret.activationCode;
     return ret;
   },
 });

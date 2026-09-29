@@ -10,6 +10,7 @@ interface AuthState {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   loadMe: () => Promise<void>;
+  setToken: (token: string) => Promise<void>;
 }
 
 interface RegisterData {
@@ -64,6 +65,20 @@ export const useAuth = create<AuthState>((set) => ({
     try {
       const { data } = await api.get<{ user: User }>("/auth/me");
       set({ user: data.user, token, loading: false });
+    } catch {
+      localStorage.removeItem("tfmio_token");
+      set({ user: null, token: null, loading: false });
+    }
+  },
+
+  // Used after account activation: we already have a fresh token from the
+  // backend, so just store it and fetch the user, instead of logging in again.
+  setToken: async (token: string) => {
+    localStorage.setItem("tfmio_token", token);
+    set({ token, loading: true });
+    try {
+      const { data } = await api.get<{ user: User }>("/auth/me");
+      set({ user: data.user, loading: false });
     } catch {
       localStorage.removeItem("tfmio_token");
       set({ user: null, token: null, loading: false });
