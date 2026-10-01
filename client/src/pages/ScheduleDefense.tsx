@@ -32,9 +32,11 @@ export default function ScheduleDefense() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [formState, setFormState] = useState<
-    Record<string, { date: string; time: string; room: string; jury: string[] }>
-  >({});
+  type FormStateType = Record<
+    string,
+    { date: string; time: string; room: string; jury: string[] }
+  >;
+  const [formState, setFormState] = useState<FormStateType>({});
   const [submitting, setSubmitting] = useState<Record<string, boolean>>({});
 
   function load() {
@@ -88,14 +90,13 @@ export default function ScheduleDefense() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Programar defensas</h1>
           <p className="text-sm text-slate-500 mt-1">
             Trabajos con memoria aprobada, listos para defender.
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading && <div className="text-sm text-slate-500">Cargando…</div>}
@@ -166,7 +167,7 @@ export default function ScheduleDefense() {
                           onClick={() => toggleJury(w._id, t._id)}
                           className={`text-xs px-3 py-1.5 rounded-lg border ${
                             form.jury.includes(t._id)
-                              ? "bg-brand text-white border-brand"
+                              ? "bg-brand-dark text-white border-brand-dark"
                               : "border-slate-300 text-slate-600"
                           }`}
                         >
@@ -179,7 +180,7 @@ export default function ScheduleDefense() {
                 <button
                   onClick={() => handleSchedule(w._id)}
                   disabled={submitting[w._id]}
-                  className="text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60 mt-4"
+                  className="text-xs px-4 py-2 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60 mt-4"
                 >
                   {submitting[w._id] ? "Programando…" : "Programar defensa"}
                 </button>

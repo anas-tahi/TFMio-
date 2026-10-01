@@ -38,7 +38,7 @@ export default function ProfileSetup() {
     setError("");
     try {
       await api.put("/students/profile", { skills, interests, workStyle });
-      await loadMe(); // refresh user in store so aiSummary shows up elsewhere
+      await loadMe();
       navigate("/");
     } catch (err: unknown) {
       const msg =
@@ -51,7 +51,7 @@ export default function ProfileSetup() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
+    <div className="flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-lg">
         <div className="mb-5">
           <h1 className="text-lg font-semibold text-slate-900">Completa tu perfil</h1>
@@ -115,7 +115,7 @@ export default function ProfileSetup() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full py-2 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-dark disabled:opacity-60 transition"
+            className="w-full py-2 rounded-lg bg-brand-dark text-white text-sm font-medium hover:opacity-90 disabled:opacity-60 transition"
           >
             {saving ? "Guardando…" : "Guardar perfil"}
           </button>

@@ -32,12 +32,11 @@ export default function ChatInbox() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Mensajes</h1>
           <p className="text-sm text-slate-500 mt-1">Habla directamente con tu tutor o estudiante.</p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading && <div className="text-sm text-slate-500">Cargando…</div>}
@@ -68,7 +67,7 @@ export default function ChatInbox() {
                   <div className="text-xs text-slate-500 mt-0.5">{c.work.topic.title}</div>
                 </div>
                 {c.unreadCount > 0 && (
-                  <span className="bg-brand text-white text-[10px] font-semibold w-5 h-5 rounded-full flex items-center justify-center">
+                  <span className="bg-brand-dark text-white text-[10px] font-semibold w-5 h-5 rounded-full flex items-center justify-center">
                     {c.unreadCount}
                   </span>
                 )}
@@ -79,4 +78,4 @@ export default function ChatInbox() {
       </div>
     </div>
   );
-}
+} 

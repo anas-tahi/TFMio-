@@ -119,7 +119,7 @@ export default function Documents() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Documentos</h1>
@@ -128,7 +128,6 @@ export default function Documents() {
               ? "Revisa los documentos entregados, con ayuda de la IA."
               : "Sube tu propuesta, informes de progreso y memoria final en PDF."}
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {!isTutor && (
@@ -157,7 +156,7 @@ export default function Documents() {
             <button
               type="submit"
               disabled={submitting}
-              className="text-xs px-4 py-2.5 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60"
+              className="text-xs px-4 py-2.5 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60"
             >
               {submitting ? "Analizando y enviando…" : "Entregar documento"}
             </button>
@@ -226,7 +225,7 @@ export default function Documents() {
                     <button
                       onClick={() => handleReview(doc._id, "approve")}
                       disabled={reviewing[doc._id]}
-                      className="text-xs px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition disabled:opacity-60"
+                      className="text-xs px-4 py-2 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60"
                     >
                       Aprobar
                     </button>

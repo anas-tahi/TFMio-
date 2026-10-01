@@ -71,7 +71,7 @@ export default function CreateTopic() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
+    <div className="flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-xl">
         <div className="mb-5">
           <h1 className="text-lg font-semibold text-slate-900">Publicar un tema de TFM/TFG</h1>
@@ -205,7 +205,7 @@ export default function CreateTopic() {
               type="button"
               disabled={saving}
               onClick={(e) => handleSubmit(e, true)}
-              className="flex-1 py-2 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-dark disabled:opacity-60 transition"
+              className="flex-1 py-2 rounded-lg bg-brand-dark text-white text-sm font-medium hover:opacity-90 disabled:opacity-60 transition"
             >
               {saving ? "Publicando…" : "Publicar tema"}
             </button>

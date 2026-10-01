@@ -51,7 +51,7 @@ export default function ProposeTopic() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="flex items-center justify-center px-4 py-20">
         <div className="bg-white border border-slate-200 rounded-2xl p-8 max-w-md text-center">
           <div className="text-2xl mb-2">📨</div>
           <div className="text-sm font-medium text-slate-800">Propuesta enviada</div>
@@ -60,7 +60,7 @@ export default function ProposeTopic() {
           </div>
           <a
             href="/"
-            className="inline-block mt-4 text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition"
+            className="inline-block mt-4 text-xs px-4 py-2 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition"
           >
             Volver al panel
           </a>
@@ -70,14 +70,13 @@ export default function ProposeTopic() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-lg mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Proponer un tema</h1>
           <p className="text-sm text-slate-500 mt-1">
             Envía tu propia idea de TFM/TFG a un tutor de tu titulación.
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
@@ -142,7 +141,7 @@ export default function ProposeTopic() {
                   onClick={() => setType(t)}
                   className={`text-xs px-4 py-2 rounded-lg border ${
                     type === t
-                      ? "bg-brand text-white border-brand"
+                      ? "bg-brand-dark text-white border-brand-dark"
                       : "border-slate-300 text-slate-600"
                   }`}
                 >
@@ -161,7 +160,7 @@ export default function ProposeTopic() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full text-xs px-4 py-2.5 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60"
+            className="w-full text-xs px-4 py-2.5 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60"
           >
             {submitting ? "Enviando…" : "Enviar propuesta"}
           </button>

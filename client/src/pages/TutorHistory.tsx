@@ -43,12 +43,11 @@ export default function TutorHistory() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-3xl mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Historial de estudiantes</h1>
           <p className="text-sm text-slate-500 mt-1">Todos tus trabajos, pasados y presentes.</p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading && <div className="text-sm text-slate-500">Cargando…</div>}

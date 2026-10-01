@@ -64,16 +64,21 @@ export default function Activate() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen relative flex items-center justify-center bg-[#0f0a0b] px-4 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-brand/30 rounded-full blur-3xl animate-float" />
+        <div className="absolute -bottom-32 -left-16 w-[28rem] h-[28rem] bg-brand-dark/60 rounded-full blur-3xl animate-float-slow" />
+      </div>
+
+      <div className="relative w-full max-w-sm animate-fade-in-up">
         <div className="text-center mb-6">
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#534AB7" }}>
-            TFM<span style={{ color: "#7F77DD" }}>io</span>
+          <div className="text-3xl font-bold text-white tracking-tight">
+            TFM<span className="text-brand">io</span>
           </div>
-          <div className="text-xs text-slate-500 mt-1">Activación de cuenta</div>
+          <div className="text-xs text-white/60 mt-1">Activación de cuenta</div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-6">
+        <div className="bg-white/95 backdrop-blur rounded-2xl border border-white/20 p-6 shadow-2xl">
           {step === "verify" && (
             <form onSubmit={handleVerify} className="space-y-3">
               <div>
@@ -82,7 +87,7 @@ export default function Activate() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2"
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand"
                   placeholder="nombre.apellido@correo.ugr.es"
                   required
                 />
@@ -92,7 +97,7 @@ export default function Activate() {
                 <input
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 tracking-widest"
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 tracking-widest transition focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand"
                   placeholder="123456"
                   maxLength={6}
                   required
@@ -100,7 +105,7 @@ export default function Activate() {
               </div>
 
               {error && (
-                <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2 animate-fade-in">
                   {error}
                 </div>
               )}
@@ -108,7 +113,7 @@ export default function Activate() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full text-xs px-4 py-2.5 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60"
+                className="w-full text-xs px-4 py-2.5 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-all"
               >
                 {loading ? "Verificando…" : "Verificar"}
               </button>
@@ -116,7 +121,7 @@ export default function Activate() {
           )}
 
           {step === "password" && (
-            <form onSubmit={handleSetPassword} className="space-y-3">
+            <form onSubmit={handleSetPassword} className="space-y-3 animate-fade-in">
               <div className="text-sm text-slate-700 mb-2">
                 Hola, <strong>{fullName}</strong>. Crea tu contraseña para continuar.
               </div>
@@ -126,7 +131,7 @@ export default function Activate() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2"
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand"
                   required
                 />
               </div>
@@ -136,13 +141,13 @@ export default function Activate() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2"
+                  className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand"
                   required
                 />
               </div>
 
               {error && (
-                <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2 animate-fade-in">
                   {error}
                 </div>
               )}
@@ -150,7 +155,7 @@ export default function Activate() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full text-xs px-4 py-2.5 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60"
+                className="w-full text-xs px-4 py-2.5 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 active:scale-[0.98] disabled:opacity-60 transition-all"
               >
                 {loading ? "Guardando…" : "Crear contraseña y entrar"}
               </button>
@@ -159,7 +164,7 @@ export default function Activate() {
         </div>
 
         <div className="text-center mt-4">
-          <a href="/login" className="text-xs text-brand font-medium">
+          <a href="/login" className="text-xs text-white/70 hover:text-white font-medium transition">
             ¿Ya tienes contraseña? Inicia sesión
           </a>
         </div>

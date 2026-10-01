@@ -75,14 +75,13 @@ export default function MyProposals() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Mis propuestas</h1>
           <p className="text-sm text-slate-500 mt-1">
             Temas que has propuesto directamente a un tutor.
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading && <div className="text-sm text-slate-500">Cargando…</div>}
@@ -122,7 +121,7 @@ export default function MyProposals() {
               {item.status === "revision_requested" && editingId !== item._id && (
                 <button
                   onClick={() => startEdit(item)}
-                  className="text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition mt-3"
+                  className="text-xs px-4 py-2 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition mt-3"
                 >
                   Editar y reenviar
                 </button>
@@ -147,7 +146,7 @@ export default function MyProposals() {
                     <button
                       onClick={() => resubmit(item._id)}
                       disabled={submitting}
-                      className="text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60"
+                      className="text-xs px-4 py-2 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60"
                     >
                       {submitting ? "Enviando…" : "Reenviar propuesta"}
                     </button>

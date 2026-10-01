@@ -50,7 +50,6 @@ export default function Recommendations() {
       try {
         await api.post("/interests", { topicId: current._id });
       } catch (err: any) {
-        // Duplicate interest or profile-missing errors still allow moving on
         const msg = err?.response?.data?.message;
         if (msg) alert(msg);
       } finally {
@@ -83,14 +82,13 @@ export default function Recommendations() {
   const leftOpacity = Math.min(Math.max(-dragX / 100, 0), 1);
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-md mx-auto">
         <div className="mb-6 text-center">
           <h1 className="text-lg font-semibold text-slate-900">Explora tus temas</h1>
           <p className="text-sm text-slate-500 mt-1">
             Desliza a la derecha si te interesa, a la izquierda para pasar.
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading && (
@@ -194,7 +192,7 @@ export default function Recommendations() {
             <button
               onClick={() => advance("interested")}
               disabled={sending}
-              className="w-14 h-14 rounded-full bg-brand text-white text-xl hover:bg-brand-dark transition disabled:opacity-60"
+              className="w-14 h-14 rounded-full bg-brand-dark text-white text-xl hover:opacity-90 transition disabled:opacity-60"
               aria-label="Me interesa"
             >
               ♥

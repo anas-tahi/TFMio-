@@ -23,9 +23,6 @@ export default function GradeWork() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Step 1: ask the backend which role THIS specific user has for THIS
-  // specific work — never guess from the account's general role, since a
-  // tutor account can also be a jury member on someone else's defense.
   useEffect(() => {
     if (!workId) return;
     let cancelled = false;
@@ -45,7 +42,6 @@ export default function GradeWork() {
     };
   }, [workId]);
 
-  // Step 2: once we know the confirmed role, fetch the matching rubric.
   useEffect(() => {
     if (!workId || !role) return;
     let cancelled = false;
@@ -92,7 +88,7 @@ export default function GradeWork() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="flex items-center justify-center px-4 py-20">
         <div className="bg-white border border-slate-200 rounded-2xl p-8 max-w-md text-center">
           <div className="text-2xl mb-2">✅</div>
           <div className="text-sm font-medium text-slate-800">Calificación enviada</div>
@@ -101,7 +97,7 @@ export default function GradeWork() {
           </div>
           <a
             href="/"
-            className="inline-block mt-4 text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition"
+            className="inline-block mt-4 text-xs px-4 py-2 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition"
           >
             Volver al panel
           </a>
@@ -111,14 +107,13 @@ export default function GradeWork() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-lg mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Calificar trabajo</h1>
           <p className="text-sm text-slate-500 mt-1">
             {role ? `Evaluación como ${role === "tutor" ? "tutor" : "miembro del tribunal"}.` : ""}
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading && <div className="text-sm text-slate-500">Cargando…</div>}
@@ -152,7 +147,7 @@ export default function GradeWork() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full text-xs px-4 py-2.5 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60"
+              className="w-full text-xs px-4 py-2.5 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60"
             >
               {submitting ? "Enviando…" : "Enviar calificación"}
             </button>

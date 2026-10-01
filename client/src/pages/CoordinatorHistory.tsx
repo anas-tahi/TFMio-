@@ -47,14 +47,13 @@ export default function CoordinatorHistory() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-3xl mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Historial de tu titulación</h1>
           <p className="text-sm text-slate-500 mt-1">
             Todos los trabajos en curso o finalizados de tu titulación.
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading && <div className="text-sm text-slate-500">Cargando…</div>}

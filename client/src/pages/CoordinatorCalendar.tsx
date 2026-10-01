@@ -10,7 +10,7 @@ interface Degree {
 
 function toInputDate(iso?: string) {
   if (!iso) return "";
-  return iso.slice(0, 10); // yyyy-mm-dd for <input type="date">
+  return iso.slice(0, 10);
 }
 
 export default function CoordinatorCalendar() {
@@ -69,7 +69,7 @@ export default function CoordinatorCalendar() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-lg mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Calendario académico</h1>
@@ -77,7 +77,6 @@ export default function CoordinatorCalendar() {
             Define los plazos para tu titulación. Una vez pasado el plazo de elección,
             los estudiantes ya no podrán enviar nuevas solicitudes.
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading && <div className="text-sm text-slate-500">Cargando…</div>}
@@ -145,7 +144,7 @@ export default function CoordinatorCalendar() {
             <button
               type="submit"
               disabled={saving}
-              className="w-full text-xs px-4 py-2.5 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60"
+              className="w-full text-xs px-4 py-2.5 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60"
             >
               {saving ? "Guardando…" : "Guardar calendario"}
             </button>

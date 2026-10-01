@@ -3,13 +3,9 @@ import { useParams } from "react-router-dom";
 import api from "../lib/api";
 import { useAuth } from "../store/auth";
 
-interface SenderRef {
-  fullName: string;
-}
-
 interface MessageItem {
   _id: string;
-  sender: {_id: string; fullName: string}
+  sender: { _id: string; fullName: string };
   text: string;
   createdAt: string;
 }
@@ -65,7 +61,7 @@ export default function Chat() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="flex flex-col" style={{ minHeight: "calc(100vh - 200px)" }}>
       <div className="bg-white border-b border-slate-200 px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
           <a href="/chat" className="text-xs text-brand font-medium">← Mensajes</a>
@@ -73,7 +69,7 @@ export default function Chat() {
         </div>
       </div>
 
-      <div className="flex-1 max-w-2xl w-full mx-auto px-4 py-6 overflow-y-auto">
+      <div className="flex-1 max-w-2xl w-full mx-auto px-4 py-6">
         {loading && <div className="text-sm text-slate-500 text-center">Cargando…</div>}
         {error && (
           <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
@@ -96,7 +92,7 @@ export default function Chat() {
                 <div
                   className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm ${
                     mine
-                      ? "bg-brand text-white rounded-br-sm"
+                      ? "bg-brand-dark text-white rounded-br-sm"
                       : "bg-white border border-slate-200 text-slate-800 rounded-bl-sm"
                   }`}
                 >
@@ -127,7 +123,7 @@ export default function Chat() {
           <button
             type="submit"
             disabled={sending || !text.trim()}
-            className="text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60"
+            className="text-xs px-4 py-2 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60"
           >
             Enviar
           </button>

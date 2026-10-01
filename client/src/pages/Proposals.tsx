@@ -71,14 +71,13 @@ export default function Proposals() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Propuestas de estudiantes</h1>
           <p className="text-sm text-slate-500 mt-1">
             Ideas de temas que los estudiantes te han enviado directamente.
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading && <div className="text-sm text-slate-500">Cargando…</div>}
@@ -130,7 +129,7 @@ export default function Proposals() {
                 <button
                   onClick={() => decide(item._id, "accept")}
                   disabled={busy[item._id]}
-                  className="text-xs px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition disabled:opacity-60"
+                  className="text-xs px-4 py-2 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60"
                 >
                   Aceptar
                 </button>

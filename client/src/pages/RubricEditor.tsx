@@ -128,7 +128,7 @@ function RubricForm({
       <button
         onClick={handleSave}
         disabled={saving}
-        className="text-xs px-4 py-2 rounded-lg bg-brand text-white font-medium hover:bg-brand-dark transition disabled:opacity-60"
+        className="text-xs px-4 py-2 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60"
       >
         {saving ? "Guardando…" : "Guardar rúbrica"}
       </button>
@@ -156,14 +156,13 @@ export default function RubricEditor() {
   const juryRubric = rubrics.find((r) => r.role === "jury");
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-lg mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Rúbricas de calificación</h1>
           <p className="text-sm text-slate-500 mt-1">
             Define criterios distintos para el tutor y el tribunal, con su propia ponderación.
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading ? (

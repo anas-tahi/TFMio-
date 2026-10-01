@@ -57,14 +57,13 @@ export default function Requests() {
   const decided = items.filter((i) => i.status !== "pending");
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="px-4 py-10">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h1 className="text-lg font-semibold text-slate-900">Solicitudes de estudiantes</h1>
           <p className="text-sm text-slate-500 mt-1">
             Estudiantes interesados en tus temas, con una explicación generada por IA.
           </p>
-          <a href="/" className="text-xs text-brand font-medium">← Volver al panel</a>
         </div>
 
         {loading && <div className="text-sm text-slate-500">Cargando solicitudes…</div>}
@@ -113,7 +112,7 @@ export default function Requests() {
                 <button
                   onClick={() => decide(item._id, "accept")}
                   disabled={deciding[item._id]}
-                  className="text-xs px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition disabled:opacity-60"
+                  className="text-xs px-4 py-2 rounded-lg bg-brand-dark text-white font-medium hover:opacity-90 transition disabled:opacity-60"
                 >
                   Aceptar
                 </button>

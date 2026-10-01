@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./store/auth";
+import Layout from "./components/Layout";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import Activate from "./pages/Activate";
 import Dashboard from "./pages/Dashboard";
 import ProfileSetup from "./pages/ProfileSetup";
@@ -27,7 +27,7 @@ import GradeWork from "./pages/GradeWork";
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuth((s) => s.token);
   if (!token) return <Navigate to="/login" replace />;
-  return <>{children}</>;
+  return <Layout>{children}</Layout>;
 }
 
 function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
@@ -51,14 +51,6 @@ export default function App() {
           element={
             <PublicOnlyRoute>
               <Login />
-            </PublicOnlyRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <PublicOnlyRoute>
-              <Register />
             </PublicOnlyRoute>
           }
         />
