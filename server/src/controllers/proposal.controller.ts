@@ -7,6 +7,7 @@ import { Interest } from "../models/Interest.js";
 import { Degree } from "../models/Degree.js";
 import { ProposalStatus, WorkStage, TopicStatus, NotificationType, UserRole, InterestStatus } from "../types/index.js";
 import { notify } from "../services/notification.service.js";
+import { isPastDeadline } from "../utils/deadlineCheck.js";
 
 const MAX_MATCHES_PER_TUTOR = 4;
 
@@ -18,12 +19,13 @@ async function hasActiveMatch(studentId: string): Promise<boolean> {
 
 /**
  * Checks if the matching deadline for a student's degree has already passed.
+ * The actual date comparison is delegated to isPastDeadline, which is
+ * covered by its own unit tests.
  */
 async function isPastMatchingDeadline(degreeId?: unknown): Promise<boolean> {
   if (!degreeId) return false;
   const degree = await Degree.findById(degreeId);
-  if (!degree?.matchingDeadline) return false;
-  return new Date() > degree.matchingDeadline;
+  return isPastDeadline(degree?.matchingDeadline);
 }
 
 /**

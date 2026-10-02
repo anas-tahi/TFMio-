@@ -5,6 +5,7 @@ import { Work } from "../models/Work.js";
 import { User } from "../models/User.js";
 import { RubricRole, WorkStage, NotificationType } from "../types/index.js";
 import { notify } from "../services/notification.service.js";
+import { calculateFinalGrade } from "../utils/gradeCalculator.js";
 
 /** Tells the caller whether they are the tutor or a jury member for this specific work. */
 export async function getMyRoleForWork(req: Request, res: Response, next: NextFunction) {
@@ -98,7 +99,8 @@ export async function submitGrade(req: Request, res: Response, next: NextFunctio
 /**
  * If the tutor and every jury member have all submitted a grade, compute the
  * final weighted grade (using each role's rubric.roleWeight) and save it on
- * the Work, moving its stage to "graded".
+ * the Work, moving its stage to "graded". The actual math is delegated to
+ * calculateFinalGrade, which is covered by its own unit tests.
  */
 async function tryFinalizeGrade(workId: string, work: InstanceType<typeof Work>) {
   const juryIds = (work.defense?.jury ?? []).map((j) => j.toString());
@@ -117,22 +119,17 @@ async function tryFinalizeGrade(workId: string, work: InstanceType<typeof Work>)
   const tutorGrade = grades.find((g) => g.grader.toString() === work.tutor.toString());
   const juryGrades = grades.filter((g) => juryIds.includes(g.grader.toString()));
 
-  const tutorAvg = tutorGrade?.weightedScore ?? 0;
-  const juryAvg =
-    juryGrades.length > 0
-      ? juryGrades.reduce((sum, g) => sum + g.weightedScore, 0) / juryGrades.length
-      : 0;
+  const tutorScore = tutorGrade?.weightedScore ?? 0;
+  const juryScores = juryGrades.map((g) => g.weightedScore);
 
   const tutorWeight = tutorRubric?.roleWeight ?? 0.5;
   const juryWeight = juryRubric?.roleWeight ?? 0.5;
-  const totalWeight = tutorWeight + juryWeight;
 
-  const finalGrade =
-    totalWeight > 0 ? (tutorAvg * tutorWeight + juryAvg * juryWeight) / totalWeight : 0;
+  const finalGrade = calculateFinalGrade(tutorScore, juryScores, tutorWeight, juryWeight);
 
   await Work.findByIdAndUpdate(workId, {
     stage: WorkStage.GRADED,
-    "grade.finalGrade": Math.round(finalGrade * 100) / 100,
+    "grade.finalGrade": finalGrade,
     "grade.gradedAt": new Date(),
   });
 
@@ -141,7 +138,7 @@ async function tryFinalizeGrade(workId: string, work: InstanceType<typeof Work>)
       recipient: student._id,
       type: NotificationType.GRADE,
       title: "¡Calificación final disponible!",
-      message: `Tu nota final es ${(Math.round(finalGrade * 100) / 100).toFixed(2)} / 10.`,
+      message: `Tu nota final es ${finalGrade.toFixed(2)} / 10.`,
       link: "/",
     });
   }
