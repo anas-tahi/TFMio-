@@ -1,4 +1,5 @@
 import { useAuth } from "../store/auth";
+import { displayFirstName } from "../lib/names";
 
 const roleNextSteps: Record<string, string[]> = {
   student: [
@@ -28,7 +29,7 @@ export default function Dashboard() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-semibold text-slate-900">
-        Hola, {user.fullName.split(" ")[0]} 👋
+        Hola, {displayFirstName(user.fullName)} 👋
       </h1>
       <p className="text-sm text-slate-500 mt-1">Bienvenido a TFMio.</p>
 

@@ -13,6 +13,14 @@ interface RubricData {
   roleWeight: number;
 }
 
+// Mirrors server/src/config/gradingDefaults.ts (official UGR rule for the TFM:
+// committee 70%, tutor 30%). Only used as the starting value for a rubric that
+// hasn't been saved yet; the coordinator can change it freely.
+const DEFAULT_ROLE_WEIGHT: Record<"tutor" | "jury", number> = {
+  tutor: 0.3,
+  jury: 0.7,
+};
+
 const emptyCriterion = (): Criterion => ({ name: "", maxPoints: 10, weight: 1 });
 
 function RubricForm({
@@ -27,7 +35,7 @@ function RubricForm({
   const [criteria, setCriteria] = useState<Criterion[]>(
     initial?.criteria?.length ? initial.criteria : [emptyCriterion()]
   );
-  const [roleWeight, setRoleWeight] = useState(initial?.roleWeight ?? 0.5);
+  const [roleWeight, setRoleWeight] = useState(initial?.roleWeight ?? DEFAULT_ROLE_WEIGHT[role]);
   const [saving, setSaving] = useState(false);
 
   function updateCriterion(i: number, field: keyof Criterion, value: string) {
@@ -162,6 +170,10 @@ export default function RubricEditor() {
           <h1 className="text-lg font-semibold text-slate-900">Rúbricas de calificación</h1>
           <p className="text-sm text-slate-500 mt-1">
             Define criterios distintos para el tutor y el tribunal, con su propia ponderación.
+          </p>
+          <p className="text-xs text-slate-400 mt-2">
+            Reparto oficial de la UGR para el TFM: tribunal 70 % (0.7) y tutor 30 % (0.3). Las dos
+            ponderaciones deberían sumar 1.
           </p>
         </div>
 

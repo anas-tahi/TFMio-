@@ -23,6 +23,7 @@ import Documents from "./pages/Documents";
 import ScheduleDefense from "./pages/ScheduleDefense";
 import RubricEditor from "./pages/RubricEditor";
 import GradeWork from "./pages/GradeWork";
+import MyWorks from "./pages/MyWorks";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuth((s) => s.token);
@@ -203,6 +204,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <GradeWork />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-works"
+          element={
+            <ProtectedRoute>
+              <MyWorks />
             </ProtectedRoute>
           }
         />

@@ -31,7 +31,10 @@ const rubricSchema = new Schema<IRubric>(
     degree: { type: Schema.Types.ObjectId, ref: "Degree", required: true, index: true },
     role: { type: String, enum: Object.values(RubricRole), required: true },
     criteria: { type: [criterionSchema], default: [] },
-    roleWeight: { type: Number, required: true, default: 0.5 },
+    // No schema-level default on purpose: a blanket 0.5 is wrong now that the
+    // official split is 30/70. The rubric editor always sends the value, and
+    // the grading code falls back to DEFAULT_ROLE_WEIGHTS if it is ever missing.
+    roleWeight: { type: Number, required: true },
   },
   { timestamps: true }
 );

@@ -6,6 +6,7 @@ import { User } from "../models/User.js";
 import { RubricRole, WorkStage, NotificationType } from "../types/index.js";
 import { notify } from "../services/notification.service.js";
 import { calculateFinalGrade } from "../utils/gradeCalculator.js";
+import { DEFAULT_ROLE_WEIGHTS } from "../config/gradingDefaults.js";
 
 /** Tells the caller whether they are the tutor or a jury member for this specific work. */
 export async function getMyRoleForWork(req: Request, res: Response, next: NextFunction) {
@@ -100,7 +101,8 @@ export async function submitGrade(req: Request, res: Response, next: NextFunctio
  * If the tutor and every jury member have all submitted a grade, compute the
  * final weighted grade (using each role's rubric.roleWeight) and save it on
  * the Work, moving its stage to "graded". The actual math is delegated to
- * calculateFinalGrade, which is covered by its own unit tests.
+ * calculateFinalGrade, which is covered by its own unit tests. If a rubric has
+ * no weight configured, the official UGR split (tutor 30% / jury 70%) applies.
  */
 async function tryFinalizeGrade(workId: string, work: InstanceType<typeof Work>) {
   const juryIds = (work.defense?.jury ?? []).map((j) => j.toString());
@@ -122,8 +124,8 @@ async function tryFinalizeGrade(workId: string, work: InstanceType<typeof Work>)
   const tutorScore = tutorGrade?.weightedScore ?? 0;
   const juryScores = juryGrades.map((g) => g.weightedScore);
 
-  const tutorWeight = tutorRubric?.roleWeight ?? 0.5;
-  const juryWeight = juryRubric?.roleWeight ?? 0.5;
+  const tutorWeight = tutorRubric?.roleWeight ?? DEFAULT_ROLE_WEIGHTS.tutor;
+  const juryWeight = juryRubric?.roleWeight ?? DEFAULT_ROLE_WEIGHTS.jury;
 
   const finalGrade = calculateFinalGrade(tutorScore, juryScores, tutorWeight, juryWeight);
 

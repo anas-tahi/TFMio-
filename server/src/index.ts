@@ -20,6 +20,7 @@ import documentRoutes from "./routes/document.routes.js";
 import defenseRoutes from "./routes/defense.routes.js";
 import rubricRoutes from "./routes/rubric.routes.js";
 import gradeRoutes from "./routes/grade.routes.js";
+import workRoutes from "./routes/work.routes.js";
 
 async function start() {
   await connectDB();
@@ -50,6 +51,7 @@ async function start() {
   app.use("/api/defense", defenseRoutes);
   app.use("/api/rubrics", rubricRoutes);
   app.use("/api/grades", gradeRoutes);
+  app.use("/api/works", workRoutes);
 
   app.use(errorHandler);
 

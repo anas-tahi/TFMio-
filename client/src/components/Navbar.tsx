@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../store/auth";
+import { displayFirstName } from "../lib/names";
 import NotificationBell from "./NotificationBell";
 
 const roleLabels: Record<string, string> = {
@@ -11,12 +12,14 @@ const roleLabels: Record<string, string> = {
 const roleLinks: Record<string, { href: string; label: string }[]> = {
   student: [
     { href: "/", label: "Panel" },
+    { href: "/my-works", label: "Mi TFM" },
     { href: "/recommendations", label: "Recomendaciones" },
     { href: "/propose-topic", label: "Proponer tema" },
     { href: "/chat", label: "Mensajes" },
   ],
   tutor: [
     { href: "/", label: "Panel" },
+    { href: "/my-works", label: "Mis trabajos" },
     { href: "/requests", label: "Solicitudes" },
     { href: "/proposals", label: "Propuestas" },
     { href: "/history", label: "Historial" },
@@ -49,6 +52,7 @@ export default function Navbar() {
   if (!user) return null;
 
   const links = roleLinks[user.role] ?? [];
+  const firstName = displayFirstName(user.fullName);
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
@@ -78,9 +82,9 @@ export default function Navbar() {
               className="flex items-center gap-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg px-2 py-1.5 transition"
             >
               <span className="w-7 h-7 rounded-full bg-brand-light text-brand-dark flex items-center justify-center text-xs font-semibold">
-                {user.fullName?.charAt(0).toUpperCase()}
+                {firstName.charAt(0).toUpperCase()}
               </span>
-              <span className="hidden sm:inline">{user.fullName?.split(" ")[0]}</span>
+              <span className="hidden sm:inline">{firstName}</span>
             </button>
 
             {menuOpen && (
