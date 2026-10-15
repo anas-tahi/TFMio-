@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Topic } from "../models/Topic.js";
 import { embed } from "../services/llm.service.js";
 import { WorkType, TopicStatus } from "../types/index.js";
+import { buildTopicText } from "../utils/topicText.js";
 
 const objectId = z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid id");
 
@@ -16,13 +17,6 @@ const createTopicSchema = z.object({
   totalSpots: z.number().min(1).optional(),
   status: z.nativeEnum(TopicStatus).optional(), // "draft" or "active"
 });
-
-/** Build the text sent to the embedding model from a topic's title + description + skills. */
-function buildTopicText(topic: { title: string; description: string; skills?: string[] }): string {
-  const parts = [topic.title, topic.description];
-  if (topic.skills?.length) parts.push(`Skills: ${topic.skills.join(", ")}`);
-  return parts.join(". ");
-}
 
 /**
  * Create a new topic for the logged-in tutor.

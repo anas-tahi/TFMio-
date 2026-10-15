@@ -14,6 +14,8 @@ interface IGrade {
   reportScore?: number; // 0–10
   finalGrade?: number; // computed weighted grade
   gradedAt?: Date;
+  released?: boolean; // true once the coordinator has published the grade to the student
+  releasedAt?: Date | null;
 }
 
 export interface IWork extends Document {
@@ -71,6 +73,8 @@ const workSchema = new Schema<IWork>(
       reportScore: { type: Number },
       finalGrade: { type: Number },
       gradedAt: { type: Date },
+      released: { type: Boolean, default: false },
+      releasedAt: { type: Date },
     },
 
     matchedAt: { type: Date, default: Date.now },

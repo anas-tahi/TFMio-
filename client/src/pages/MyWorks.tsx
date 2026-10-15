@@ -11,6 +11,8 @@ interface WorkItem {
   topic: { title: string };
   defense?: { date?: string; time?: string; room?: string };
   grade?: { finalGrade?: number };
+  gradeReleased?: boolean;
+  gradeLabel?: "Aprobado" | "Suspenso" | null;
 }
 
 const stageLabels: Record<string, string> = {
@@ -84,6 +86,9 @@ export default function MyWorks() {
               (w.myRole === "tutor" || w.myRole === "jury") &&
               (w.stage === "defense_ready" || w.stage === "defended");
 
+            const finalGrade = w.grade?.finalGrade;
+            const passed = w.gradeLabel === "Aprobado";
+
             return (
               <div key={w._id} className="bg-white rounded-2xl border border-slate-200 p-5">
                 <div className="flex items-start justify-between gap-3">
@@ -111,9 +116,41 @@ export default function MyWorks() {
                   )}
                 </div>
 
-                {w.stage === "graded" && w.grade?.finalGrade !== undefined && w.myRole === "student" && (
-                  <div className="mt-3 text-sm bg-brand-light text-brand-dark rounded-lg px-3 py-2">
-                    Nota final: <strong>{w.grade.finalGrade.toFixed(2)} / 10</strong>
+                {/* Student: waiting for the coordinator to publish */}
+                {w.stage === "graded" && w.myRole === "student" && !w.gradeReleased && (
+                  <div className="mt-3 text-sm bg-slate-50 text-slate-600 border border-slate-200 rounded-lg px-3 py-2">
+                    Tu trabajo ya está calificado. La nota estará disponible cuando el coordinador la publique.
+                  </div>
+                )}
+
+                {/* Student: grade published */}
+                {w.stage === "graded" && w.myRole === "student" && w.gradeReleased && finalGrade !== undefined && (
+                  <div className="mt-3 flex items-center justify-between gap-3 text-sm bg-brand-light text-brand-dark rounded-lg px-3 py-2">
+                    <span>
+                      Nota final: <strong>{finalGrade.toFixed(2)} / 10</strong>
+                    </span>
+                    {w.gradeLabel && (
+                      <span
+                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                          passed ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {w.gradeLabel}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Tutor / jury: always see the computed grade, with its publication status */}
+                {w.stage === "graded" && w.myRole !== "student" && finalGrade !== undefined && (
+                  <div className="mt-3 flex items-center justify-between gap-3 text-sm bg-slate-50 text-slate-700 border border-slate-200 rounded-lg px-3 py-2">
+                    <span>
+                      Nota final: <strong>{finalGrade.toFixed(2)} / 10</strong>
+                      {w.gradeLabel ? ` · ${w.gradeLabel}` : ""}
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      {w.gradeReleased ? "Publicada" : "Pendiente de publicar"}
+                    </span>
                   </div>
                 )}
 

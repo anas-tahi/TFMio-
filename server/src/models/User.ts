@@ -19,11 +19,15 @@ export interface IUser extends Document {
   interests?: string;
   workStyle?: string;
   aiSummary?: string; // LLM-generated profile summary (feature #03)
-  embedding?: number[]; // profile embedding vector (feature #33)
+
+  // Profile embedding vector. Students: built from skills/interests/work style.
+  // Tutors: built from department, areas of expertise and bio.
+  embedding?: number[];
 
   // ── Tutor-specific fields ──
   department?: string;
   bio?: string;
+  areas?: string[]; // areas of expertise, from the same tag list as topics and skills
   degrees?: Types.ObjectId[]; // refs Degree — a tutor can supervise across several titulaciones
 
   // ── Coordinator-specific fields ──
@@ -55,6 +59,7 @@ const userSchema = new Schema<IUser>(
     // Tutor
     department: { type: String },
     bio: { type: String },
+    areas: { type: [String], default: undefined },
     degrees: { type: [Schema.Types.ObjectId], ref: "Degree", default: undefined },
 
     // Coordinator — scoped to exactly one degree, per Miguel's feedback

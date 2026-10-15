@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
+import tutorRoutes from "./routes/tutor.routes.js";
 import topicRoutes from "./routes/topic.routes.js";
 import degreeRoutes from "./routes/degree.routes.js";
 import recommendationRoutes from "./routes/recommendation.routes.js";
@@ -21,6 +22,8 @@ import defenseRoutes from "./routes/defense.routes.js";
 import rubricRoutes from "./routes/rubric.routes.js";
 import gradeRoutes from "./routes/grade.routes.js";
 import workRoutes from "./routes/work.routes.js";
+import gradeReleaseRoutes from "./routes/gradeRelease.routes.js";
+import suggestionRoutes from "./routes/suggestion.routes.js";
 
 async function start() {
   await connectDB();
@@ -36,6 +39,7 @@ async function start() {
 
   app.use("/api/auth", authRoutes);
   app.use("/api/students", studentRoutes);
+  app.use("/api/tutors", tutorRoutes);
   app.use("/api/topics", topicRoutes);
   app.use("/api/degrees", degreeRoutes);
   app.use("/api/recommendations", recommendationRoutes);
@@ -52,6 +56,8 @@ async function start() {
   app.use("/api/rubrics", rubricRoutes);
   app.use("/api/grades", gradeRoutes);
   app.use("/api/works", workRoutes);
+  app.use("/api/grade-release", gradeReleaseRoutes);
+  app.use("/api/suggestions", suggestionRoutes);
 
   app.use(errorHandler);
 

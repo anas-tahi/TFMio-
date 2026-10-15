@@ -3,7 +3,7 @@ import { Grade } from "../models/Grade.js";
 import { Rubric } from "../models/Rubric.js";
 import { Work } from "../models/Work.js";
 import { User } from "../models/User.js";
-import { RubricRole, WorkStage, NotificationType } from "../types/index.js";
+import { RubricRole, WorkStage, NotificationType, UserRole } from "../types/index.js";
 import { notify } from "../services/notification.service.js";
 import { calculateFinalGrade } from "../utils/gradeCalculator.js";
 import { DEFAULT_ROLE_WEIGHTS } from "../config/gradingDefaults.js";
@@ -103,6 +103,9 @@ export async function submitGrade(req: Request, res: Response, next: NextFunctio
  * the Work, moving its stage to "graded". The actual math is delegated to
  * calculateFinalGrade, which is covered by its own unit tests. If a rubric has
  * no weight configured, the official UGR split (tutor 30% / jury 70%) applies.
+ *
+ * The grade is NOT shown to the student yet: it stays unreleased until the
+ * degree's coordinator publishes it, so the coordinator is notified instead.
  */
 async function tryFinalizeGrade(workId: string, work: InstanceType<typeof Work>) {
   const juryIds = (work.defense?.jury ?? []).map((j) => j.toString());
@@ -133,16 +136,25 @@ async function tryFinalizeGrade(workId: string, work: InstanceType<typeof Work>)
     stage: WorkStage.GRADED,
     "grade.finalGrade": finalGrade,
     "grade.gradedAt": new Date(),
+    "grade.released": false,
+    "grade.releasedAt": null,
   });
 
   if (student) {
-    await notify({
-      recipient: student._id,
-      type: NotificationType.GRADE,
-      title: "¡Calificación final disponible!",
-      message: `Tu nota final es ${finalGrade.toFixed(2)} / 10.`,
-      link: "/",
+    const coordinator = await User.findOne({
+      role: UserRole.COORDINATOR,
+      degreeManaged: student.degree,
     });
+
+    if (coordinator) {
+      await notify({
+        recipient: coordinator._id,
+        type: NotificationType.GRADE,
+        title: "Calificación final lista para publicar",
+        message: `${student.fullName}: ${finalGrade.toFixed(2)} / 10. Revísala y publícala para el estudiante.`,
+        link: "/coordinator/grades",
+      });
+    }
   }
 }
 

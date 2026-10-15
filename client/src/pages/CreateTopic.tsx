@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../lib/api";
+import SimilarTopicsNotice from "../components/SimilarTopicsNotice";
 
 interface Degree {
   _id: string;
@@ -106,6 +107,14 @@ export default function CreateTopic() {
             rows={4}
             className="w-full mb-3 px-3 py-2 rounded-lg border border-slate-300 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-brand/40"
             placeholder="Describe el tema, sus objetivos y qué se espera del estudiante..."
+          />
+
+          <SimilarTopicsNotice
+            audience="tutor"
+            title={title}
+            description={description}
+            skills={skills}
+            className="mb-3"
           />
 
           <div className="grid grid-cols-2 gap-3 mb-3">

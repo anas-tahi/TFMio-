@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Activate from "./pages/Activate";
 import Dashboard from "./pages/Dashboard";
 import ProfileSetup from "./pages/ProfileSetup";
+import TutorProfile from "./pages/TutorProfile";
 import CreateTopic from "./pages/CreateTopic";
 import Recommendations from "./pages/Recommendations";
 import Requests from "./pages/Requests";
@@ -24,6 +25,7 @@ import ScheduleDefense from "./pages/ScheduleDefense";
 import RubricEditor from "./pages/RubricEditor";
 import GradeWork from "./pages/GradeWork";
 import MyWorks from "./pages/MyWorks";
+import CoordinatorGrades from "./pages/CoordinatorGrades";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuth((s) => s.token);
@@ -68,6 +70,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <ProfileSetup />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tutor-profile"
+          element={
+            <ProtectedRoute>
+              <TutorProfile />
             </ProtectedRoute>
           }
         />
@@ -196,6 +206,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <RubricEditor />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coordinator/grades"
+          element={
+            <ProtectedRoute>
+              <CoordinatorGrades />
             </ProtectedRoute>
           }
         />

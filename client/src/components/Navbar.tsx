@@ -30,7 +30,14 @@ const roleLinks: Record<string, { href: string; label: string }[]> = {
     { href: "/coordinator/matches", label: "Emparejamientos" },
     { href: "/coordinator/history", label: "Historial" },
     { href: "/coordinator/calendar", label: "Calendario" },
+    { href: "/coordinator/grades", label: "Calificaciones" },
   ],
+};
+
+// Where "Mi perfil" leads, per role. Coordinators have no editable profile.
+const profileLinks: Record<string, string> = {
+  student: "/profile-setup",
+  tutor: "/tutor-profile",
 };
 
 export default function Navbar() {
@@ -52,6 +59,7 @@ export default function Navbar() {
   if (!user) return null;
 
   const links = roleLinks[user.role] ?? [];
+  const profileHref = profileLinks[user.role];
   const firstName = displayFirstName(user.fullName);
 
   return (
@@ -93,6 +101,14 @@ export default function Navbar() {
                   <div className="text-xs font-medium text-slate-800">{user.fullName}</div>
                   <div className="text-[11px] text-brand mt-0.5">{roleLabels[user.role]}</div>
                 </div>
+                {profileHref && (
+                  <a
+                    href={profileHref}
+                    className="block px-4 py-2 text-xs text-slate-600 hover:bg-slate-50"
+                  >
+                    Mi perfil
+                  </a>
+                )}
                 <button
                   onClick={logout}
                   className="w-full text-left px-4 py-2 text-xs text-slate-600 hover:bg-slate-50"

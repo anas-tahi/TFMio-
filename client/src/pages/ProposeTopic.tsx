@@ -1,10 +1,22 @@
 import { useEffect, useState } from "react";
 import api from "../lib/api";
+import SimilarTopicsNotice from "../components/SimilarTopicsNotice";
 
 interface TutorOption {
   _id: string;
   fullName: string;
   department: string;
+}
+
+interface Suggestion {
+  tutorId: string;
+  fullName: string;
+  department: string;
+  areas: string[];
+  score: number;
+  source: "profile" | "topic";
+  topicTitle?: string;
+  atCapacity: boolean;
 }
 
 export default function ProposeTopic() {
@@ -20,6 +32,11 @@ export default function ProposeTopic() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [unranked, setUnranked] = useState(0);
+  const [suggesting, setSuggesting] = useState(false);
+  const [suggestError, setSuggestError] = useState("");
+
   useEffect(() => {
     api
       .get<{ tutors: TutorOption[] }>("/students/tutors")
@@ -30,6 +47,55 @@ export default function ProposeTopic() {
       })
       .finally(() => setLoadingTutors(false));
   }, []);
+
+  // AI tutor suggestions: wait until the student stops typing, then ask the
+  // backend. The cancelled flag makes sure an old, slower response can never
+  // overwrite a newer one. A failure shows a short note; the form itself
+  // keeps working without suggestions.
+  useEffect(() => {
+    if (title.trim().length < 5 || description.trim().length < 20) {
+      setSuggestions([]);
+      setUnranked(0);
+      setSuggestError("");
+      setSuggesting(false);
+      return;
+    }
+
+    let cancelled = false;
+    setSuggesting(true);
+    setSuggestError("");
+
+    const timer = setTimeout(() => {
+      api
+        .post<{ suggestions: Suggestion[]; unranked: number }>("/suggestions/tutors", {
+          title,
+          description,
+        })
+        .then((res) => {
+          if (cancelled) return;
+          setSuggestions(res.data.suggestions);
+          setUnranked(res.data.unranked);
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          setSuggestions([]);
+          setUnranked(0);
+          setSuggestError(
+            err?.response?.status === 503
+              ? "Las sugerencias de IA no están disponibles ahora mismo. Puedes elegir tutor manualmente."
+              : "No se pudieron cargar las sugerencias. Puedes elegir tutor manualmente."
+          );
+        })
+        .finally(() => {
+          if (!cancelled) setSuggesting(false);
+        });
+    }, 900);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [title, description]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -69,6 +135,8 @@ export default function ProposeTopic() {
     );
   }
 
+  const showSuggestions = suggesting || suggestions.length > 0 || unranked > 0;
+
   return (
     <div className="px-4 py-10">
       <div className="max-w-lg mx-auto">
@@ -80,6 +148,95 @@ export default function ProposeTopic() {
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+          <div>
+            <label className="text-xs text-slate-500 mb-1 block">Título</label>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2"
+              placeholder="Título de tu propuesta de tema"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-slate-500 mb-1 block">Descripción</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={5}
+              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2"
+              placeholder="Explica de qué trata tu idea, qué te gustaría investigar o desarrollar"
+            />
+          </div>
+
+          {suggestError && (
+            <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              {suggestError}
+            </div>
+          )}
+
+          <SimilarTopicsNotice
+            audience="student"
+            title={title}
+            description={description}
+            showErrors={false}
+          />
+
+          {showSuggestions && (
+            <div className="rounded-xl border border-brand-mid/40 bg-brand-light/50 p-4">
+              <div className="text-xs font-semibold text-brand-dark mb-2">
+                Tutores sugeridos por la IA
+              </div>
+
+              {suggesting && suggestions.length === 0 && (
+                <div className="text-xs text-slate-500">Analizando tu propuesta…</div>
+              )}
+
+              <div className={`space-y-2 transition-opacity ${suggesting ? "opacity-60" : ""}`}>
+                {suggestions.slice(0, 3).map((s) => (
+                  <div
+                    key={s.tutorId}
+                    className="flex items-center justify-between gap-3 bg-white rounded-lg border border-slate-200 px-3 py-2"
+                  >
+                    <div className="min-w-0">
+                      <div className="text-sm text-slate-900 truncate">{s.fullName}</div>
+                      <div className="text-[11px] text-slate-500 truncate">
+                        {s.source === "topic" && s.topicTitle
+                          ? `Por su tema «${s.topicTitle}»`
+                          : "Por su perfil de especialidad"}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-brand-dark text-white">
+                        {s.score}%
+                      </span>
+                      {s.atCapacity ? (
+                        <span className="text-[11px] text-slate-400">Completo</span>
+                      ) : tutorId === s.tutorId ? (
+                        <span className="text-[11px] text-emerald-700">Seleccionado</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setTutorId(s.tutorId)}
+                          className="text-[11px] px-2.5 py-1 rounded-md border border-brand text-brand hover:bg-brand-light transition"
+                        >
+                          Elegir
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {unranked > 0 && (
+                <div className="text-[11px] text-slate-400 mt-2">
+                  {unranked} tutor(es) de tu titulación todavía no tienen perfil ni temas publicados,
+                  así que no se han podido valorar.
+                </div>
+              )}
+            </div>
+          )}
+
           {loadingTutors && <div className="text-xs text-slate-500">Cargando tutores…</div>}
           {loadError && (
             <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
@@ -109,27 +266,6 @@ export default function ProposeTopic() {
               )}
             </div>
           )}
-
-          <div>
-            <label className="text-xs text-slate-500 mb-1 block">Título</label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2"
-              placeholder="Título de tu propuesta de tema"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs text-slate-500 mb-1 block">Descripción</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={5}
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2"
-              placeholder="Explica de qué trata tu idea, qué te gustaría investigar o desarrollar"
-            />
-          </div>
 
           <div>
             <label className="text-xs text-slate-500 mb-1 block">Tipo</label>
