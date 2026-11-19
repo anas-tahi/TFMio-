@@ -3,7 +3,8 @@ import { RubricRole } from "../types/index.js";
 
 interface ICriterionScore {
   name: string;
-  points: number; // score given, out of the criterion's maxPoints
+  points?: number; // absent when the grader marked the item as not evaluated
+  notEvaluated?: boolean;
 }
 
 export interface IGrade extends Document {
@@ -20,7 +21,8 @@ export interface IGrade extends Document {
 const criterionScoreSchema = new Schema<ICriterionScore>(
   {
     name: { type: String, required: true },
-    points: { type: Number, required: true },
+    points: { type: Number },
+    notEvaluated: { type: Boolean },
   },
   { _id: false }
 );

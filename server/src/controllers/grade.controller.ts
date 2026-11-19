@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { z } from "zod";
 import { Grade } from "../models/Grade.js";
 import { Rubric } from "../models/Rubric.js";
 import { Work } from "../models/Work.js";
@@ -6,7 +7,21 @@ import { User } from "../models/User.js";
 import { RubricRole, WorkStage, NotificationType, UserRole } from "../types/index.js";
 import { notify } from "../services/notification.service.js";
 import { calculateFinalGrade } from "../utils/gradeCalculator.js";
+import { calculateWeightedScore } from "../utils/weightedScore.js";
 import { DEFAULT_ROLE_WEIGHTS } from "../config/gradingDefaults.js";
+import { MAX_UNEVALUATED_ITEMS } from "../config/gradingRules.js";
+
+const submitGradeSchema = z.object({
+  scores: z
+    .array(
+      z.object({
+        name: z.string().min(1),
+        points: z.number().nullable().optional(),
+        notEvaluated: z.boolean().optional(),
+      })
+    )
+    .min(1),
+});
 
 /** Tells the caller whether they are the tutor or a jury member for this specific work. */
 export async function getMyRoleForWork(req: Request, res: Response, next: NextFunction) {
@@ -26,13 +41,22 @@ export async function getMyRoleForWork(req: Request, res: Response, next: NextFu
   }
 }
 
-/** Anyone involved (tutor or jury member) fetches the rubric they need to grade with. */
+/**
+ * Anyone involved (tutor or jury member) fetches the rubric they need to grade
+ * with, plus how many of its items they are allowed to leave unevaluated.
+ * Answers 409 if the work is no longer waiting for grades (for example, the
+ * coordinator already closed it with the grades received), so the page can
+ * show that right away instead of only after a failed submit.
+ */
 export async function getRubricForGrading(req: Request, res: Response, next: NextFunction) {
   try {
     const { workId, role } = req.params as { workId: string; role: RubricRole };
 
     const work = await Work.findById(workId);
     if (!work) return res.status(404).json({ message: "No encontrado" });
+    if (work.stage !== WorkStage.DEFENDED && work.stage !== WorkStage.DEFENSE_READY) {
+      return res.status(409).json({ message: "Este trabajo aún no está listo para calificar" });
+    }
 
     const isTutor = work.tutor.toString() === req.user!.userId;
     const isJury = (work.defense?.jury ?? []).some((j) => j.toString() === req.user!.userId);
@@ -42,7 +66,10 @@ export async function getRubricForGrading(req: Request, res: Response, next: Nex
     const rubric = await Rubric.findOne({ degree: student?.degree, role });
     if (!rubric) return res.status(404).json({ message: "No hay rúbrica configurada para este rol" });
 
-    return res.json({ rubric });
+    const maxNotEvaluated =
+      role === RubricRole.TUTOR ? MAX_UNEVALUATED_ITEMS.tutor : MAX_UNEVALUATED_ITEMS.jury;
+
+    return res.json({ rubric, maxNotEvaluated });
   } catch (err) {
     next(err);
   }
@@ -52,7 +79,7 @@ export async function getRubricForGrading(req: Request, res: Response, next: Nex
 export async function submitGrade(req: Request, res: Response, next: NextFunction) {
   try {
     const { workId } = req.params;
-    const { scores } = req.body as { scores: { name: string; points: number }[] };
+    const { scores } = submitGradeSchema.parse(req.body);
 
     const work = await Work.findById(workId);
     if (!work) return res.status(404).json({ message: "No encontrado" });
@@ -70,21 +97,22 @@ export async function submitGrade(req: Request, res: Response, next: NextFunctio
     const rubric = await Rubric.findOne({ degree: student?.degree, role });
     if (!rubric) return res.status(400).json({ message: "No hay rúbrica configurada" });
 
-    // Compute this grader's weighted score (0–10) from their per-criterion points.
-    let weightedSum = 0;
-    let weightTotal = 0;
-    for (const criterion of rubric.criteria) {
-      const given = scores.find((s) => s.name === criterion.name);
-      const points = given?.points ?? 0;
-      const normalized = (points / criterion.maxPoints) * 10; // scale to 0–10
-      weightedSum += normalized * criterion.weight;
-      weightTotal += criterion.weight;
-    }
-    const weightedScore = weightTotal > 0 ? weightedSum / weightTotal : 0;
+    // The tutor may leave up to 2 items unevaluated; committee members none.
+    const maxNotEvaluated = isTutor ? MAX_UNEVALUATED_ITEMS.tutor : MAX_UNEVALUATED_ITEMS.jury;
+    const result = calculateWeightedScore(rubric.criteria, scores, maxNotEvaluated);
+    if (!result.ok) return res.status(400).json({ message: result.error });
+
+    // Save one entry per rubric item: either its points or "not evaluated".
+    const storedScores = rubric.criteria.map((c) => {
+      const given = scores.find((s) => s.name === c.name);
+      return given?.notEvaluated
+        ? { name: c.name, notEvaluated: true }
+        : { name: c.name, points: Number(given?.points) };
+    });
 
     const grade = await Grade.findOneAndUpdate(
       { work: workId, grader: req.user!.userId },
-      { role, scores, weightedScore },
+      { role, scores: storedScores, weightedScore: result.weightedScore },
       { new: true, upsert: true }
     );
 

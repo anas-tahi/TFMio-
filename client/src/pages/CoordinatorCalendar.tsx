@@ -6,6 +6,7 @@ interface Degree {
   submissionDeadline?: string;
   presentationPeriodStart?: string;
   presentationPeriodEnd?: string;
+  gradingDays?: number;
 }
 
 function toInputDate(iso?: string) {
@@ -23,6 +24,8 @@ export default function CoordinatorCalendar() {
   const [submissionDeadline, setSubmissionDeadline] = useState("");
   const [presentationPeriodStart, setPresentationPeriodStart] = useState("");
   const [presentationPeriodEnd, setPresentationPeriodEnd] = useState("");
+  // Kept as text so an empty box is different from a real number.
+  const [gradingDays, setGradingDays] = useState("7");
 
   useEffect(() => {
     api
@@ -33,6 +36,7 @@ export default function CoordinatorCalendar() {
         setSubmissionDeadline(toInputDate(d.submissionDeadline));
         setPresentationPeriodStart(toInputDate(d.presentationPeriodStart));
         setPresentationPeriodEnd(toInputDate(d.presentationPeriodEnd));
+        setGradingDays(String(d.gradingDays ?? 7));
       })
       .catch(() => setError("No se pudo cargar el calendario"))
       .finally(() => setLoading(false));
@@ -43,12 +47,18 @@ export default function CoordinatorCalendar() {
     setSaving(true);
     setSaved(false);
     try {
-      await api.patch("/degrees/calendar/mine", {
+      const res = await api.patch<{ degree: Degree }>("/degrees/calendar/mine", {
         matchingDeadline: matchingDeadline || null,
         submissionDeadline: submissionDeadline || null,
         presentationPeriodStart: presentationPeriodStart || null,
         presentationPeriodEnd: presentationPeriodEnd || null,
+        // An empty box sends nothing, so the saved number stays as it is.
+        gradingDays: gradingDays.trim() === "" ? undefined : Number(gradingDays),
       });
+      // Show the number the server actually saved (it keeps it between 1 and 60).
+      if (res.data.degree?.gradingDays !== undefined) {
+        setGradingDays(String(res.data.degree.gradingDays));
+      }
       setSaved(true);
     } catch {
       alert("No se pudo guardar el calendario");
@@ -133,6 +143,27 @@ export default function CoordinatorCalendar() {
                   className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-slate-500 mb-1 block">
+                Plazo para calificar tras la defensa (días)
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={60}
+                value={gradingDays}
+                onChange={(e) => {
+                  setSaved(false);
+                  setGradingDays(e.target.value);
+                }}
+                className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2"
+              />
+              <p className="text-[11px] text-slate-400 mt-1">
+                Días que tienen el tutor y el tribunal, tras la defensa, para entregar su
+                calificación. Entre 1 y 60; por defecto 7.
+              </p>
             </div>
 
             {saved && (

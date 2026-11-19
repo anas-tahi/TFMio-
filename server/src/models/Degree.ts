@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 import { WorkType } from "../types/index.js";
+import { MIN_GRADING_DAYS, MAX_GRADING_DAYS } from "../config/gradingDeadline.js";
 
 export interface IDegree extends Document {
   _id: Types.ObjectId;
@@ -14,6 +15,7 @@ export interface IDegree extends Document {
   submissionDeadline?: Date; // final memoria must be submitted by this date
   presentationPeriodStart?: Date; // defense window opens
   presentationPeriodEnd?: Date; // defense window closes
+  gradingDays?: number; // days the tutor and the committee have, after the defense, to grade
 
   createdAt: Date;
   updatedAt: Date;
@@ -31,6 +33,9 @@ const degreeSchema = new Schema<IDegree>(
     submissionDeadline: { type: Date },
     presentationPeriodStart: { type: Date },
     presentationPeriodEnd: { type: Date },
+    // No default on purpose: a degree that never saved it answers with the
+    // default of config/gradingDeadline through normalizeGradingDays.
+    gradingDays: { type: Number, min: MIN_GRADING_DAYS, max: MAX_GRADING_DAYS },
   },
   { timestamps: true }
 );

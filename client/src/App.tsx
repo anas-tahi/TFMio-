@@ -26,6 +26,7 @@ import RubricEditor from "./pages/RubricEditor";
 import GradeWork from "./pages/GradeWork";
 import MyWorks from "./pages/MyWorks";
 import CoordinatorGrades from "./pages/CoordinatorGrades";
+import PendingGrades from "./pages/PendingGrades";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuth((s) => s.token);
@@ -214,6 +215,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <CoordinatorGrades />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coordinator/pending-grades"
+          element={
+            <ProtectedRoute>
+              <PendingGrades />
             </ProtectedRoute>
           }
         />

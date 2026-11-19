@@ -24,6 +24,8 @@ import gradeRoutes from "./routes/grade.routes.js";
 import workRoutes from "./routes/work.routes.js";
 import gradeReleaseRoutes from "./routes/gradeRelease.routes.js";
 import suggestionRoutes from "./routes/suggestion.routes.js";
+import pendingGradesRoutes from "./routes/pendingGrades.routes.js";
+import { startGradingDeadlineJob } from "./services/gradingAlerts.service.js";
 
 async function start() {
   await connectDB();
@@ -58,6 +60,7 @@ async function start() {
   app.use("/api/works", workRoutes);
   app.use("/api/grade-release", gradeReleaseRoutes);
   app.use("/api/suggestions", suggestionRoutes);
+  app.use("/api/pending-grades", pendingGradesRoutes);
 
   app.use(errorHandler);
 
@@ -65,6 +68,8 @@ async function start() {
     console.log(`✓ TFMio API running on http://localhost:${env.port}`);
     console.log(`  Environment: ${env.nodeEnv}`);
   });
+
+  startGradingDeadlineJob();
 }
 
 start().catch((err) => {

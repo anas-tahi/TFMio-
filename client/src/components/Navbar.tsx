@@ -30,6 +30,7 @@ const roleLinks: Record<string, { href: string; label: string }[]> = {
     { href: "/coordinator/matches", label: "Emparejamientos" },
     { href: "/coordinator/history", label: "Historial" },
     { href: "/coordinator/calendar", label: "Calendario" },
+    { href: "/coordinator/pending-grades", label: "Por calificar" },
     { href: "/coordinator/grades", label: "Calificaciones" },
   ],
 };

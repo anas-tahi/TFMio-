@@ -1,6 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { Degree } from "../models/Degree.js";
+import { Degree, IDegree } from "../models/Degree.js";
 import { User } from "../models/User.js";
+import { normalizeGradingDays } from "../utils/gradingDeadline.js";
+
+/** A degree as the frontend sees it: gradingDays always has a usable value. */
+function withGradingDays(degree: IDegree) {
+  return { ...degree.toObject(), gradingDays: normalizeGradingDays(degree.gradingDays) };
+}
 
 /** List all degrees (titulaciones) — used to populate dropdowns in forms. */
 export async function getDegrees(_req: Request, res: Response, next: NextFunction) {
@@ -20,13 +26,19 @@ export async function setCalendar(req: Request, res: Response, next: NextFunctio
       return res.status(400).json({ message: "No tienes una titulación asignada" });
     }
 
-    const { matchingDeadline, submissionDeadline, presentationPeriodStart, presentationPeriodEnd } =
-      req.body as {
-        matchingDeadline?: string;
-        submissionDeadline?: string;
-        presentationPeriodStart?: string;
-        presentationPeriodEnd?: string;
-      };
+    const {
+      matchingDeadline,
+      submissionDeadline,
+      presentationPeriodStart,
+      presentationPeriodEnd,
+      gradingDays,
+    } = req.body as {
+      matchingDeadline?: string;
+      submissionDeadline?: string;
+      presentationPeriodStart?: string;
+      presentationPeriodEnd?: string;
+      gradingDays?: number;
+    };
 
     const degree = await Degree.findByIdAndUpdate(
       coordinator.degreeManaged,
@@ -39,11 +51,14 @@ export async function setCalendar(req: Request, res: Response, next: NextFunctio
         ...(presentationPeriodEnd !== undefined && {
           presentationPeriodEnd: presentationPeriodEnd || null,
         }),
+        ...(gradingDays !== undefined && { gradingDays: normalizeGradingDays(gradingDays) }),
       },
       { new: true }
     );
 
-    return res.json({ degree });
+    if (!degree) return res.status(404).json({ message: "Titulación no encontrada" });
+
+    return res.json({ degree: withGradingDays(degree) });
   } catch (err) {
     next(err);
   }
@@ -56,8 +71,11 @@ export async function getMyCalendar(req: Request, res: Response, next: NextFunct
     if (!coordinator?.degreeManaged) {
       return res.status(400).json({ message: "No tienes una titulación asignada" });
     }
+
     const degree = await Degree.findById(coordinator.degreeManaged);
-    return res.json({ degree });
+    if (!degree) return res.status(404).json({ message: "Titulación no encontrada" });
+
+    return res.json({ degree: withGradingDays(degree) });
   } catch (err) {
     next(err);
   }

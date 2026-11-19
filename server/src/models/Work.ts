@@ -18,6 +18,25 @@ interface IGrade {
   releasedAt?: Date | null;
 }
 
+interface IGradingAlerts {
+  reminderSentAt?: Date; // when the "please grade" reminder went to the people still missing
+  overdueSentAt?: Date; // when the coordinator was told who missed the deadline
+}
+
+interface IMissingGrader {
+  grader: Types.ObjectId; // ref User
+  name: string; // their name at the time, so the record stays readable
+}
+
+/** Written when the coordinator closes a grade without everyone's evaluation. */
+interface IGradeClosure {
+  closedAt?: Date;
+  closedBy?: Types.ObjectId; // ref User (the coordinator)
+  reason?: string;
+  missing?: IMissingGrader[];
+  receivedCount?: number; // how many evaluations the final grade was calculated from
+}
+
 export interface IWork extends Document {
   _id: Types.ObjectId;
   student: Types.ObjectId; // ref User
@@ -32,11 +51,22 @@ export interface IWork extends Document {
 
   defense: IDefense;
   grade: IGrade;
+  gradingAlerts?: IGradingAlerts;
+  gradingExtraDays?: number; // extra days the coordinator gave graders for this work
+  gradeClosure?: IGradeClosure;
 
   matchedAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const missingGraderSchema = new Schema<IMissingGrader>(
+  {
+    grader: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    name: { type: String, required: true },
+  },
+  { _id: false }
+);
 
 const workSchema = new Schema<IWork>(
   {
@@ -75,6 +105,21 @@ const workSchema = new Schema<IWork>(
       gradedAt: { type: Date },
       released: { type: Boolean, default: false },
       releasedAt: { type: Date },
+    },
+
+    gradingAlerts: {
+      reminderSentAt: { type: Date },
+      overdueSentAt: { type: Date },
+    },
+
+    gradingExtraDays: { type: Number, min: 0 },
+
+    gradeClosure: {
+      closedAt: { type: Date },
+      closedBy: { type: Schema.Types.ObjectId, ref: "User" },
+      reason: { type: String },
+      missing: { type: [missingGraderSchema], default: undefined },
+      receivedCount: { type: Number },
     },
 
     matchedAt: { type: Date, default: Date.now },
