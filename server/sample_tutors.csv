@@ -1,0 +1,12 @@
+fullName,email,department,areas,bio
+"Prof. Francisco Herrera Triguero","francisco.herrera@fake.tfmio.es","DECSAI","Machine Learning;Data Science","Investiga en minería de datos y sistemas de aprendizaje con grandes volúmenes de información."
+"Prof. María José Martín Bautista","mariajose.martin@fake.tfmio.es","DECSAI","Data Science;NLP","Trabaja en extracción de conocimiento y recuperación de información a partir de texto."
+"Prof. Juan Manuel Fernández Luna","juanmanuel.fernandez@fake.tfmio.es","DECSAI","NLP;Data Science","Especialista en sistemas de recuperación de información y búsqueda."
+"Prof. Francisco José Cortijo Bon","francisco.cortijo@fake.tfmio.es","DECSAI","Computer Vision;Machine Learning","Trabaja en reconocimiento de patrones y visión por computador."
+"Prof. David Alejandro Pelta Mochcovsky","david.pelta@fake.tfmio.es","DECSAI","Machine Learning;Robotics","Investiga en optimización y toma de decisiones con incertidumbre."
+"Prof. Carlos Alberto Cruz Corona","carlos.cruz@fake.tfmio.es","DECSAI","Data Science;Cloud Computing","Trabaja en modelos de decisión y optimización aplicada."
+"Prof. Juan Carlos Torres Cantero","juancarlos.torres@fake.tfmio.es","LSI","Web Development;Robotics","Investiga en informática gráfica y simulación interactiva."
+"Prof. María Luisa Rodríguez Almendros","marialuisa.rodriguez@fake.tfmio.es","LSI","Databases;Web Development","Trabaja en integración de información y diseño de software."
+"Prof. Ramón López-Cózar Delgado","ramon.lopezcozar@fake.tfmio.es","LSI","NLP;Security","Especialista en sistemas de diálogo basados en procesamiento del habla."
+"Prof. Patricia Paderewski Rodríguez","patricia.paderewski@fake.tfmio.es","LSI","Web Development;Distributed Systems","Investiga en especificación, diseño y evolución de sistemas software."
+"Prof. Sergio Alonso Burgos","sergio.alonso@fake.tfmio.es","LSI","Distributed Systems;Databases","Trabaja en sistemas distribuidos y bases de datos aplicadas."

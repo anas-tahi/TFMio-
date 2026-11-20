@@ -26,6 +26,13 @@ interface JuryOption {
   department: string;
 }
 
+interface JurySuggestionItem {
+  tutorId: string;
+  fullName: string;
+  department: string;
+  score: number;
+}
+
 export default function ScheduleDefense() {
   const [works, setWorks] = useState<WorkItem[]>([]);
   const [juryPool, setJuryPool] = useState<JuryOption[]>([]);
@@ -38,6 +45,10 @@ export default function ScheduleDefense() {
   >;
   const [formState, setFormState] = useState<FormStateType>({});
   const [submitting, setSubmitting] = useState<Record<string, boolean>>({});
+
+  const [suggestions, setSuggestions] = useState<Record<string, JurySuggestionItem[]>>({});
+  const [suggesting, setSuggesting] = useState<Record<string, boolean>>({});
+  const [suggestError, setSuggestError] = useState<Record<string, string>>({});
 
   function load() {
     setLoading(true);
@@ -70,6 +81,29 @@ export default function ScheduleDefense() {
       ? current.filter((id) => id !== tutorId)
       : [...current, tutorId];
     updateForm(workId, "jury", next);
+  }
+
+  async function handleSuggestJury(workId: string) {
+    setSuggesting((s) => ({ ...s, [workId]: true }));
+    setSuggestError((e) => ({ ...e, [workId]: "" }));
+    try {
+      const res = await api.get<{ suggestions: JurySuggestionItem[] }>(
+        `/defense/${workId}/jury-suggestion`
+      );
+      setSuggestions((s) => ({ ...s, [workId]: res.data.suggestions }));
+      updateForm(
+        workId,
+        "jury",
+        res.data.suggestions.map((sg) => sg.tutorId)
+      );
+    } catch (err: any) {
+      setSuggestError((e) => ({
+        ...e,
+        [workId]: err?.response?.data?.message || "No se pudo calcular una sugerencia",
+      }));
+    } finally {
+      setSuggesting((s) => ({ ...s, [workId]: false }));
+    }
   }
 
   async function handleSchedule(workId: string) {
@@ -115,6 +149,7 @@ export default function ScheduleDefense() {
         <div className="space-y-4">
           {works.map((w) => {
             const form = formState[w._id] || { date: "", time: "", room: "", jury: [] };
+            const workSuggestions = suggestions[w._id];
             return (
               <div key={w._id} className="bg-white rounded-2xl border border-slate-200 p-5">
                 <div className="text-sm font-medium text-slate-900">{w.student.fullName}</div>
@@ -155,26 +190,59 @@ export default function ScheduleDefense() {
                   />
                 </div>
 
-                <div className="mt-3">
-                  <label className="text-xs text-slate-500 mb-1 block">Tribunal</label>
-                  <div className="flex flex-wrap gap-2">
-                    {juryPool
-                      .filter((t) => t._id !== w.tutor._id)
-                      .map((t) => (
-                        <button
-                          key={t._id}
-                          type="button"
-                          onClick={() => toggleJury(w._id, t._id)}
-                          className={`text-xs px-3 py-1.5 rounded-lg border ${
-                            form.jury.includes(t._id)
-                              ? "bg-brand-dark text-white border-brand-dark"
-                              : "border-slate-300 text-slate-600"
-                          }`}
-                        >
-                          {t.fullName}
-                        </button>
-                      ))}
+                <div className="mt-3 flex items-center justify-between">
+                  <label className="text-xs text-slate-500 block">Tribunal</label>
+                  <button
+                    type="button"
+                    onClick={() => handleSuggestJury(w._id)}
+                    disabled={suggesting[w._id]}
+                    className="text-[11px] px-2.5 py-1 rounded-md border border-brand text-brand hover:bg-brand-light transition disabled:opacity-60"
+                  >
+                    {suggesting[w._id] ? "Calculando…" : "Sugerir tribunal (IA)"}
+                  </button>
+                </div>
+
+                {suggestError[w._id] && (
+                  <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
+                    {suggestError[w._id]}
                   </div>
+                )}
+
+                {workSuggestions && workSuggestions.length > 0 && (
+                  <div className="mt-2 rounded-lg border border-brand-mid/40 bg-brand-light/40 p-2.5 space-y-1">
+                    {workSuggestions.map((s) => (
+                      <div key={s.tutorId} className="flex items-center justify-between text-[11px]">
+                        <span className="text-slate-700">
+                          {s.fullName} <span className="text-slate-400">· {s.department}</span>
+                        </span>
+                        <span className="font-semibold px-1.5 py-0.5 rounded-full bg-brand-dark text-white">
+                          {s.score}%
+                        </span>
+                      </div>
+                    ))}
+                    <div className="text-[10px] text-slate-500 pt-1">
+                      Sugerencia orientativa, ya marcada abajo. Puedes cambiarla libremente.
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {juryPool
+                    .filter((t) => t._id !== w.tutor._id)
+                    .map((t) => (
+                      <button
+                        key={t._id}
+                        type="button"
+                        onClick={() => toggleJury(w._id, t._id)}
+                        className={`text-xs px-3 py-1.5 rounded-lg border ${
+                          form.jury.includes(t._id)
+                            ? "bg-brand-dark text-white border-brand-dark"
+                            : "border-slate-300 text-slate-600"
+                        }`}
+                      >
+                        {t.fullName}
+                      </button>
+                    ))}
                 </div>
 
                 <button
